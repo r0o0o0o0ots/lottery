@@ -6,6 +6,7 @@ import random
 import re
 import socket
 from ShowMsg import ShowMsg
+from MatchMatches import MatchMatches
 
 class HtmlViewer:
 
@@ -91,3 +92,15 @@ class HtmlViewer:
             self.closeConnection()
             self.URI = self.history_URI.pop()
             self.tryConnect()
+
+    def analyse(self, info_type='match_list'):
+        if info_type == 'match_list':
+            mm = MatchMatches()
+            mm.matchLists(self.html)
+        elif info_type == 'match_result':
+            pass
+        elif info_type == 'match_live':
+            pass
+        else:
+            ShowMsg.showMsgEndline("Unknown info type '%s'" % (info_type,))
+            return []
