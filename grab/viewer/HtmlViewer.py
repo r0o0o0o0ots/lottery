@@ -3,10 +3,10 @@ __author__ = 'zz'
 from urllib import urlopen
 from time import sleep
 import random
-import re
 import socket
 from ShowMsg import ShowMsg
 from MatchMatches import MatchMatches
+from Graber import Graber
 
 class HtmlViewer:
 
@@ -71,19 +71,32 @@ class HtmlViewer:
         if not self.conn == None:
             self.conn.close()
 
-    def forward(self, theLinkName):
-        match_flag = False
-        pattern_matchlink = re.compile('<a\s+href="(.*?)".*?>%s</a>' % (theLinkName,))
-        for link in pattern_matchlink.findall(self.html):
-            if 'football' in link or 'fb_' in link:
-                self.history_URI.append(self.URI)
-                self.closeConnection()
-                self.URI = link
-                self.tryConnect()
-                match_flag = True
-                break
-        if not match_flag:
-            ShowMsg.showMsgEndline("Could not find link.")
+    def home(self, home_URI='http://www.sporttery.cn'):
+        ShowMsg.showMsgEndline("Redirect to home.")
+        self.closeConnection()
+        self.history_URI = []
+        self.URI = home_URI
+        self.tryConnect()
+
+    def forward(self, theLinkName, theLink=""):
+        if theLink == "":
+            match_flag = False
+            link_lst = Graber.grabAll('<a\s+href="(.*?)".*?>%s</a>' % (theLinkName,), self.html)
+            for link in link_lst:
+                if 'football' in link or 'fb_' in link:
+                    self.history_URI.append(self.URI)
+                    self.closeConnection()
+                    self.URI = link
+                    self.tryConnect()
+                    match_flag = True
+                    break
+            if not match_flag:
+                ShowMsg.showMsgEndline("Could not find link.")
+        else:
+            self.history_URI.append(self.URI)
+            self.closeConnection()
+            self.URI = theLink
+            self.tryConnect()
 
     def back(self):
         if len(self.history_URI) <= 0:
@@ -96,7 +109,7 @@ class HtmlViewer:
     def analyse(self, info_type='match_list'):
         if info_type == 'match_list':
             mm = MatchMatches()
-            mm.matchLists(self.html)
+            return mm.matchLists(self.html)
         elif info_type == 'match_result':
             pass
         elif info_type == 'match_live':
