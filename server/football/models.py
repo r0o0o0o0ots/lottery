@@ -14,7 +14,7 @@ class Match(models.Model):
 
 class Odd(models.Model):
     match=models.ForeignKey(Match)
-    time=models.DateTimeField()
+    time=models.DateTimeField(auto_now=True)
     odd=models.CharField(max_length=500)
 
 class CurrentMatch(models.Model):
