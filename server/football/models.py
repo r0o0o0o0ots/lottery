@@ -5,7 +5,7 @@ from account.models import Account
 class Match(models.Model):
     home=models.CharField(max_length=50)
     away=models.CharField(max_length=50)
-    handicap=models.SmallIntegerField()
+    handicap=models.CharField(max_length=3)
     HAD=models.CharField(max_length=1,default='x')
     HHAD=models.CharField(max_length=1,default='x')
     CRS=models.CharField(max_length=5,default='x:x')
