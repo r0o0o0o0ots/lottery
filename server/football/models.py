@@ -6,11 +6,11 @@ class Match(models.Model):
     home=models.CharField(max_length=50)
     away=models.CharField(max_length=50)
     handicap=models.SmallIntegerField()
-    HAD=models.CharField(max_length=1)
-    HHAD=models.CharField(max_length=1)
-    CRT=models.CharField(max_length=5)
-    TTG=models.PositiveSmallIntegerField()
-    HFT=models.PositiveSmallIntegerField()
+    HAD=models.CharField(max_length=1,default='x')
+    HHAD=models.CharField(max_length=1,default='x')
+    CRS=models.CharField(max_length=5,default='x:x')
+    TTG=models.PositiveSmallIntegerField(default=0)
+    HFT=models.PositiveSmallIntegerField(default=0)
 
 class Odd(models.Model):
     match=models.ForeignKey(Match)
