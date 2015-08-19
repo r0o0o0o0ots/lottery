@@ -80,7 +80,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'lottery',
-        'HOST': '192.168.1.109',
+        'HOST': '192.168.1.250',
         'PORT': '3306',
         'USER': 'root',
         'PASSWORD': 'qwe',

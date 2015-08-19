@@ -1,0 +1,15 @@
+<ion-view view-title="竞彩足球">
+<ion-nav-buttons side="right">
+    <button class="button button-positive" ng-click="goNext()">下一步</button>
+</ion-nav-buttons>
+<ion-content padding="true" class="text-center">
+<ion-refresher pulling-text="Pull to refresh..." on-refresh="doRefresh()">
+</ion-refresher>
+<ion-list>
+<ion-item ng-repeat="match in matches">
+    <h2>{{match['home']}} <i>VS</i> {{match['away']}}</h1>
+    <button class="button button-block" ng-click="showOptions($index)">点击选择购买项</button>
+</ion-item>
+</ion-list>
+</ion-content>
+</ion-view>

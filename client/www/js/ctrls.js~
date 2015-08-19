@@ -1,0 +1,38 @@
+app.controller('MenuCtrl',['$scope','$ionicModal',
+    function($scope,$ionicModal){
+        $scope.signinData = {};
+        $ionicModal.fromTemplateUrl('html/signin.html',{scope:$scope}).then(function(modal){$scope.signinModal=modal;});
+        $scope.showSignin=function(){
+            $scope.signinModal.show();
+        }
+        $scope.closeSignin=function(){
+            $scope.signinModal.hide();
+        }
+        $scope.signin=function(){
+            $scope.acct=$scope.signinData;
+            $scope.signinModal.hide();
+        }
+
+        $scope.signupData = {};
+        $ionicModal.fromTemplateUrl('html/signup.html',{scope:$scope}).then(function(modal){$scope.signupModal=modal;});
+        $scope.showSignup=function(){
+            $scope.signupModal.show();
+        }
+        $scope.closeSignup=function(){
+            $scope.signupModal.hide();
+        }
+        $scope.signin=function(){
+            $scope.acct=$scope.signupData;
+            $scope.signupModal.hide();
+        }
+    }]);
+
+app.controller('SignupCtrl',['$scope',
+    function($scope){
+        $scope.data='signup';
+    }]);
+
+app.controller('SigninCtrl',['$scope',
+    function($scope){
+        $scope.data='signin';
+    }]);

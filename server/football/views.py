@@ -14,6 +14,7 @@ def getMatchInfo(request):
         match=cmatch.match
         odd=cmatch.odd
         info={}
+        info['id']=match.id
         info['home']=match.home
         info['away']=match.away
         info['handicap']=match.handicap

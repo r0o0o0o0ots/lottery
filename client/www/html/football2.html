@@ -1,0 +1,15 @@
+<ion-view view-title="投注列表">
+<ion-nav-buttons side="right">
+    <button class="button button-positive" ng-click="buy()">购买</button>
+</ion-nav-buttons>
+<ion-content padding="true" class="text-center">
+<h1>你已选择{{selectedMatchNumber}}场比赛</h1>
+<ion-list>
+<ion-item ng-repeat="match in selectedMatches">
+<h2>{{match.home}} <i>VS</i> {{match.away}}</h2>
+<p>已购买{{match.selectedNum}}项</p>
+<p>{{match.selected}}</p>
+</ion-item>
+</ion-list>
+</ion-content>
+</ion-view>

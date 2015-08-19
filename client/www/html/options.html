@@ -1,0 +1,21 @@
+<ion-modal-view class="text-center">
+    <ion-header-bar>
+        <h1 class="title">{{match.home}} <i>VS</i> {{match.away}}</h1>
+        <button class="button button-positive" ng-click="closeOptions()">关闭</button>
+        <button class="button button-positive" ng-click="confirmOptions()">确定</button>
+    </ion-header-bar>
+    <ion-content>
+        <ion-list>
+            <ion-item ng-repeat="c in categories">
+                <h3>{{c['title']}}</h2>
+                <div ng-repeat="row in c['indices']">
+                        <div class="button-bar">
+                            <a ng-repeat="index in row" class="button button-small button-block" ng-class="{'button-positive': isSelected({{index}})}" ng-click="select({{index}})">
+                                <font size="3">{{labels[index]}}</font><br><font size="1">{{match['odd'][index]}}</font>
+                            </a>
+                        </div>
+                </div>
+            </ion-item>
+        </ion-list>
+    </ion-content>
+</ion-modal-view>

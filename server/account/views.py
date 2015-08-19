@@ -4,7 +4,6 @@ import json
 
 # Create your views here.
 def signin(request):
-    print 123
     r = HttpResponse()
     r['Access-Control-Allow-Origin'] = '*'
     data = {}
@@ -13,11 +12,9 @@ def signin(request):
     #    r['Access-Control-Allow-Methods']= 'GET,PUT,POST'
     #    r['Access-Control-Allow-Headers']= 'accept, content-type'
     #    r['Access-Control-Max-Age'] = 1728000
-    #    print 'op'
     #    return r
 
     params = json.loads(request.body)
-    print params
     email = params.get('email')
     password = params.get('password')
     if not email or not password:

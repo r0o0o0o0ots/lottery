@@ -1,0 +1,31 @@
+<ion-view view-title="登陆">
+<ion-content padding="true">
+<form ng-submit="signin()" name="form" novalidate>
+    <div class="list">
+        <label class="item item-input item-stacked-label">
+            <span class="input-label">邮箱</span>
+            <input name="email" type="email" ng-model="signinData.email" required>
+            <span ng-show="form.email.$dirty&&form.email.$invalid">
+                <p ng-show="form.email.$error.required" style="color:red">请输入邮箱</p>
+                <p ng-show="form.email.$error.email" style="color:red">邮箱格式不正确</p>
+            </span>
+        </label>
+        <label class="item item-input item-stacked-label">
+            <span class="input-label">密码</span>
+            <input name="password" type="password" ng-minlength="3" ng-maxlength="20" ng-model="signinData.password" required>
+            <span ng-show="form.password.$dirty&&form.password.$invalid">
+                <p ng-show="form.password.$error.required" style="color:red">请输入密码</p>
+                <p ng-show="form.password.$error.minlength" style="color:red">密码长度过短</p>
+                <p ng-show="form.password.$error.maxlength" style="color:red">密码长度过长</p>
+            </span>
+        </label>
+        <label class="item">
+            <button class="button button-block button-positive" type="submit" ng-disabled="form.$invalid">登陆</button>
+        </label>
+        <label class="item">
+            <button class="button button-block button-positive" type="button" ng-click="signinToSignup()">没有账户？注册</button>
+        </label>
+    </div>
+</form>
+</ion-content>
+</ion-view>
