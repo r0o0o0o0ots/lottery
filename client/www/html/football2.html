@@ -1,6 +1,6 @@
 <ion-view view-title="投注列表">
 <ion-nav-buttons side="right">
-    <button class="button button-positive" ng-click="buy()">购买</button>
+    <button class="button button-positive" ng-click="createBill()">下单</button>
 </ion-nav-buttons>
 <ion-content padding="true" class="text-center">
 <h1>你已选择{{selectedMatchNumber}}场比赛</h1>
@@ -12,4 +12,11 @@
 </ion-item>
 </ion-list>
 </ion-content>
+<ion-footer-bar class="bar bar-footer bar-calm item-input-inset" style="float:right">
+<button class="button button-positive" style="width:30%" ng-click="showComb()">选择串关方式</button>
+<label style="width:20%;text-align:right">倍数: </label>
+<button class="button button-positive" style="width:10%;" ng-click="minus()">-</button>
+<input type="number" min="1" step="1" style="width:30%" ng-model="multiple">
+<button class="button button-positive" style="width:10%" ng-click="plus()">+</button>
+</ion-footer-bar>
 </ion-view>

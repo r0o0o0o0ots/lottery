@@ -32,12 +32,12 @@ app.controller('MenuCtrl',['$scope','$state',
             }
         }
         $scope.football=function(){
-            if(acct===undefined){
-                $state.go('signin',{next:'football'});
-            }
-            else{
+            //if(acct===undefined){
+            //    $state.go('signin',{next:'football'});
+            //}
+            //else{
                 $state.go('football',{},{reload:true});
-            }
+            //}
         }
     }]);
 
@@ -141,10 +141,13 @@ app.controller('FootballCtrl',['$scope','$state','$http','$ionicModal',
             $scope.optionsModal.hide();
         };
         $scope.confirmOptions=function(){
-            if(Object.keys($scope.selectedTemp).length>0){
+            n=Object.keys($scope.selectedTemp).length;
+            if(n>0){
+                $scope.match.selectedn=n;
                 $scope.match.selected=$scope.selectedTemp;
             }
             else{
+                delete $scope.match.selectedn;
                 delete $scope.match.selected;
             }
             $scope.match=null;
@@ -163,6 +166,10 @@ app.controller('FootballCtrl',['$scope','$state','$http','$ionicModal',
             return option in $scope.selectedTemp;
         };
 
+
+        $scope.matchSelected=function(index){
+            return $scope.matches[index].selectedn!==undefined;
+        };
         $scope.goNext=function(){
             matches=$scope.matches;
             $state.go('football2',{},{reload:true});
@@ -178,20 +185,72 @@ app.controller('FootballCtrl',['$scope','$state','$http','$ionicModal',
 
 app.controller('Football2Ctrl',['$scope','$state','$http','$ionicModal',
     function($scope,$state,$http,$ionicModal){
-        $scope.buy=function(){
-            $state.go('football');
-        };
-
         $scope.selectedMatchNumber=0;
         $scope.selectedMatches=[];
         for(i=0;i<matches.length;i++){
             match=matches[i];
-            if(match.selected===undefined){
-                continue;
+            if(match.selected!==undefined){
+                n=Object.keys(match.selected).length;
+                match['selectedNum']=n;
+                $scope.selectedMatchNumber++;
+                $scope.selectedMatches.push(match);
             }
-            n=Object.keys(match.selected).length;
-            match['selectedNum']=n;
-            $scope.selectedMatchNumber++;
-            $scope.selectedMatches.push(match);
         }
+
+        $scope.multiple=1;
+        $scope.plus=function(){
+            if($scope.multiple<9){
+                $scope.multiple+=1;
+            }
+        };
+        $scope.minus=function(){
+            if($scope.multiple>1){
+                $scope.multiple-=1;
+            }
+        };
+        $ionicModal.fromTemplateUrl('html/comb.html',{
+            scope:$scope
+        }).then(function(modal){
+            $scope.combModal=modal;
+        });
+        $scope.combs=[
+            {num:'2',selected:false,text:'2串1'},
+            {num:'3',selected:false,text:'3串1'},
+            {num:'4',selected:false,text:'4串1'}
+        ];
+        $scope.showComb=function(){
+            $scope.combModal.show();
+        };
+        $scope.confirmComb=function(){
+            $scope.combModal.hide();
+        };
+
+        $scope.createBill=function(){
+            if($scope.selectedMatchNumber===0){
+                alert('no match selected');
+                return;
+            }
+            selectedCombs="";
+            for(i=0;i<$scope.combs.length;i++){
+                if($scope.combs[i].selected){
+                    selectedCombs+=$scope.combs[i].num;
+                }
+            }
+            if(selectedCombs===''){
+                alert('no comb selected');
+                return;
+            }
+            if(!$scope.multiple||$scope.multiple<1||$scope.multiple>99){
+                alert("multiple:1-99");
+                return;
+            }
+            billInfo={};
+            billInfo.multiple=$scope.multiple;
+            billInfo.combs=selectedCombs;
+            billInfo.matches=[];
+            for(i=0;i<$scope.selectedMatchNumber;i++){
+                match=
+            }
+            //$state.go('football');
+        };
     }]);

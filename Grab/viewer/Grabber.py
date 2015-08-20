@@ -98,7 +98,7 @@ class Grabber:
 
     def __commitData(self, dictm):
         import sys,os
-        sys.path.append('/home/zz/lottery/server/')
+        sys.path.append('/home/wang/code/lottery/server/')
         os.environ['DJANGO_SETTINGS_MODULE']='server.settings'
         from football.models import Match,Odd,CurrentMatch
         ma = Match()

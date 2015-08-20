@@ -1,0 +1,16 @@
+<ion-modal-view class="text-center">
+    <ion-header-bar>
+        <h1 class="title">选择串关方式</h1>
+    </ion-header-bar>
+    <ion-content padding="true">
+        <ul class="list">
+            <li class="item item-checkbox" ng-repeat="comb in combs">
+                <label class="checkbox">
+                    <input type="checkbox" ng-model="comb.selected">
+                </label>
+                {{comb.text}}
+            </li>
+        </ul>
+        <button class="button button-block button-positive" ng-click="confirmComb()">确定</button>
+    </ion-content>
+</ion-modal-view>
