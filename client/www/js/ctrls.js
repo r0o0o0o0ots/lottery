@@ -108,13 +108,13 @@ app.controller('FootballCtrl',['$scope','$state','$http','$ionicModal',
             {title:'半全场',indices:[[14,15,16],[17,18,19],[20,21,22]]},
             {title:'全场比分',indices:[[23,24,25,26,27,28],[29,30,31,32,33,34],[35],[36,37,38,39],[40],[41,42,43,44,45,46],[47,48,49,50,51,52],[53]]}
         ];
-        $scope.range=function(n){
-            r=[];
-            for(i=0;i<n;i++){
-                r.push(i);
-            }
-            return r;
-        };
+        //$scope.range=function(n){
+        //    r=[];
+        //    for(i=0;i<n;i++){
+        //        r.push(i);
+        //    }
+        //    return r;
+        //};
         $scope.labels=['胜','平','负','让球胜','让球平','让球负','0','1','2','3','4','5','6','7+','胜胜','胜平','胜负','平胜','平平','平负','负胜','负平','负负',
                       '1:0','2:0','2:1','3:0','3:1','3:2','4:0','4:1','4:2','5;0','5:1','5:2','胜其它',
                       '0:0','1:1','2:2','3:3','平其它',
@@ -125,45 +125,44 @@ app.controller('FootballCtrl',['$scope','$state','$http','$ionicModal',
         }).then(function(modal){
             $scope.optionsModal=modal;
         });
+        $scope.matchIndex=-1;
+        $scope.optionSelected=[];
         $scope.showOptions=function(index){
-            $scope.match=$scope.matches[index];
-            if($scope.match.selected===undefined){
-                $scope.selectedTemp={};
+            $scope.matchIndex=index;
+            for(i=0;i<54;i++){
+                $scope.optionSelected[i]=false;
             }
-            else{
-                $scope.selectedTemp=JSON.parse(JSON.stringify($scope.match.selected));
+            selectedOptions=$scope.matches[index].selectedOptions;
+            if(selectedOptions!==undefined){
+                for(i=0;i<selectedOptions.length;i++){
+                    $scope.optionSelected[selectedOptions[i]]=true;
+                }
             }
             $scope.optionsModal.show();
         };
         $scope.closeOptions=function(){
-            $scope.match=null;
-            $scope.selectedTemp=null;
             $scope.optionsModal.hide();
         };
         $scope.confirmOptions=function(){
-            n=Object.keys($scope.selectedTemp).length;
-            if(n>0){
-                $scope.match.selectedn=n;
-                $scope.match.selected=$scope.selectedTemp;
+            selectedOptions=[];
+            for(i=0;i<54;i++){
+                if($scope.optionSelected[i]){
+                    selectedOptions.push(i);
+                }
+            }
+            if(selectedOptions.length>0){
+                $scope.matches[$scope.matchIndex].selectedOptions=selectedOptions;
             }
             else{
-                delete $scope.match.selectedn;
-                delete $scope.match.selected;
+                delete $scope.matches[$scope.matchIndex].selectedOptions;
             }
-            $scope.match=null;
-            $scope.selectedTemp=null;
             $scope.optionsModal.hide();
         };
-        $scope.select=function(option){
-            if(option in $scope.selectedTemp){
-                delete $scope.selectedTemp[option];
-            }
-            else{
-                $scope.selectedTemp[option]=true;
-            }
+        $scope.optionPressed=function(option){
+            $scope.optionSelected[option]=!$scope.optionSelected[option];
         };
-        $scope.isSelected=function(option){
-            return option in $scope.selectedTemp;
+        $scope.isOptionSelected=function(option){
+            return $scope.optionSelected[option];
         };
 
 
@@ -185,21 +184,17 @@ app.controller('FootballCtrl',['$scope','$state','$http','$ionicModal',
 
 app.controller('Football2Ctrl',['$scope','$state','$http','$ionicModal',
     function($scope,$state,$http,$ionicModal){
-        $scope.selectedMatchNumber=0;
         $scope.selectedMatches=[];
         for(i=0;i<matches.length;i++){
             match=matches[i];
-            if(match.selected!==undefined){
-                n=Object.keys(match.selected).length;
-                match['selectedNum']=n;
-                $scope.selectedMatchNumber++;
+            if(match.selectedOptions!==undefined){
                 $scope.selectedMatches.push(match);
             }
         }
 
         $scope.multiple=1;
         $scope.plus=function(){
-            if($scope.multiple<9){
+            if($scope.multiple<99){
                 $scope.multiple+=1;
             }
         };
@@ -214,9 +209,9 @@ app.controller('Football2Ctrl',['$scope','$state','$http','$ionicModal',
             $scope.combModal=modal;
         });
         $scope.combs=[
-            {num:'2',selected:false,text:'2串1'},
-            {num:'3',selected:false,text:'3串1'},
-            {num:'4',selected:false,text:'4串1'}
+            {num:2,selected:false,text:'2串1'},
+            {num:3,selected:false,text:'3串1'},
+            {num:4,selected:false,text:'4串1'}
         ];
         $scope.showComb=function(){
             $scope.combModal.show();
@@ -226,17 +221,17 @@ app.controller('Football2Ctrl',['$scope','$state','$http','$ionicModal',
         };
 
         $scope.createBill=function(){
-            if($scope.selectedMatchNumber===0){
+            if($scope.selectedMatches.length===0){
                 alert('no match selected');
                 return;
             }
-            selectedCombs="";
+            selectedCombs=[];
             for(i=0;i<$scope.combs.length;i++){
                 if($scope.combs[i].selected){
-                    selectedCombs+=$scope.combs[i].num;
+                    selectedCombs.push($scope.combs[i].num);
                 }
             }
-            if(selectedCombs===''){
+            if(selectedCombs.length===0){
                 alert('no comb selected');
                 return;
             }
@@ -245,12 +240,20 @@ app.controller('Football2Ctrl',['$scope','$state','$http','$ionicModal',
                 return;
             }
             billInfo={};
+            billInfo.acct=acct;
             billInfo.multiple=$scope.multiple;
             billInfo.combs=selectedCombs;
             billInfo.matches=[];
-            for(i=0;i<$scope.selectedMatchNumber;i++){
-                match=
+            for(i=0;i<$scope.selectedMatches.length;i++){
+                match=$scope.selectedMatches[i];
+                billInfo.matches.push({
+                    'id':match.id,
+                    'selectedOptions':match.selectedOptions,
+                });
             }
-            //$state.go('football');
+
+            myhttp($http,server+'/football/createBill',billInfo,function(data){
+                $state.go('billDetail/'+data['billid']);
+            });
         };
     }]);

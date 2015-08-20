@@ -3,12 +3,12 @@
     <button class="button button-positive" ng-click="createBill()">下单</button>
 </ion-nav-buttons>
 <ion-content padding="true" class="text-center">
-<h1>你已选择{{selectedMatchNumber}}场比赛</h1>
+<h1>你已选择{{selectedMatches.length}}场比赛</h1>
 <ion-list>
 <ion-item ng-repeat="match in selectedMatches">
 <h2>{{match.home}} <i>VS</i> {{match.away}}</h2>
-<p>已购买{{match.selectedNum}}项</p>
-<p>{{match.selected}}</p>
+<p>已购买{{match.selectedOptions.length}}项</p>
+<p>{{match.selectedOptions}}</p>
 </ion-item>
 </ion-list>
 </ion-content>
