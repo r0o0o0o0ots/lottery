@@ -3,6 +3,8 @@ from . import views
 
 urlpatterns = [
             url(r'getMatchInfo', views.getMatchInfo, name='getMatchInfo' ),
+            url(r'createBill', views.createBill, name='createBill' ),
+            url(r'getFootballBills', views.getFootballBills, name='getFootballBills' ),
 
 ]
 

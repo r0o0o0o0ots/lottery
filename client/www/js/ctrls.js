@@ -1,6 +1,9 @@
 var server="http://127.0.0.1:8000";
-var acct;
+var acct={};
+acct.email='a@b.com';
+acct.password='qwe';
 var matches;
+var fbbills;
 
 function myhttp($http,url,data,successfunc){
     $http({
@@ -125,14 +128,13 @@ app.controller('FootballCtrl',['$scope','$state','$http','$ionicModal',
         }).then(function(modal){
             $scope.optionsModal=modal;
         });
-        $scope.matchIndex=-1;
         $scope.optionSelected=[];
         $scope.showOptions=function(index){
-            $scope.matchIndex=index;
+            $scope.match=$scope.matches[index];
             for(i=0;i<54;i++){
                 $scope.optionSelected[i]=false;
             }
-            selectedOptions=$scope.matches[index].selectedOptions;
+            selectedOptions=$scope.match.selectedOptions;
             if(selectedOptions!==undefined){
                 for(i=0;i<selectedOptions.length;i++){
                     $scope.optionSelected[selectedOptions[i]]=true;
@@ -151,10 +153,10 @@ app.controller('FootballCtrl',['$scope','$state','$http','$ionicModal',
                 }
             }
             if(selectedOptions.length>0){
-                $scope.matches[$scope.matchIndex].selectedOptions=selectedOptions;
+                $scope.match.selectedOptions=selectedOptions;
             }
             else{
-                delete $scope.matches[$scope.matchIndex].selectedOptions;
+                delete $scope.match.selectedOptions;
             }
             $scope.optionsModal.hide();
         };
@@ -239,8 +241,10 @@ app.controller('Football2Ctrl',['$scope','$state','$http','$ionicModal',
                 alert("multiple:1-99");
                 return;
             }
+            alert();
             billInfo={};
-            billInfo.acct=acct;
+            billInfo.email=acct.email;
+            billInfo.password=acct.password;
             billInfo.multiple=$scope.multiple;
             billInfo.combs=selectedCombs;
             billInfo.matches=[];
@@ -248,12 +252,43 @@ app.controller('Football2Ctrl',['$scope','$state','$http','$ionicModal',
                 match=$scope.selectedMatches[i];
                 billInfo.matches.push({
                     'id':match.id,
-                    'selectedOptions':match.selectedOptions,
+                    'selectedOptions':match.selectedOptions
                 });
             }
 
             myhttp($http,server+'/football/createBill',billInfo,function(data){
-                $state.go('billDetail/'+data['billid']);
+                alert(data.billid);
+                //$state.go('billDetail/'+data['billid']);
+            });
+        };
+    }]);
+
+app.controller('FootballBillsCtrl',['$scope','$state','$http',
+    function($scope,$state,$http){
+        myhttp($http,server+'/football/getFootballBills',{email:acct.email,password:acct.password},function(data){
+            fbills=data.bills.reverse();
+            $scope.fbills=fbills;
+        });
+        $scope.showDetail=function(index){
+            $state.go('footballBillDetail',{index:index});
+        };
+    }]);
+
+app.controller('FootballBillDetailCtrl',['$scope','$state','$ionicPopup',
+    function($scope,$state,$ionicPopup){
+        index=$state.params['index'];
+        $scope.fbill=fbills[index];
+
+        $scope.pay=function(){
+            money=2*$scope.fbill.bet_count*$scope.fbill.multiple;
+            $ionicPopup.confirm({
+                title: '确认付款',
+                template: '是否确认付款'+money+'元'
+            }).then(function(yes){
+                if(yes){
+                    id=$scope.fbill.id;
+                    alert(yes);
+                }
             });
         };
     }]);

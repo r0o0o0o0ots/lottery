@@ -84,6 +84,7 @@ DATABASES = {
         'PORT': '3306',
         'USER': 'root',
         'PASSWORD': 'qwe',
+        'ATOMIC_REQUESTS': 'true',
     }
 }
 

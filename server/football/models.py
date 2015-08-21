@@ -23,7 +23,7 @@ class CurrentMatch(models.Model):
 
 class FootballBill(models.Model):
     acct=models.ForeignKey(Account)
-    time=models.DateTimeField()
+    time=models.DateTimeField(auto_now=True)
     #type=models.PositiveSmallIntegerField()
     comb_type=models.CharField(max_length=7)
     bet_count=models.PositiveIntegerField()

@@ -37,6 +37,16 @@ $stateProvider.state('football2', {
         templateUrl: 'html/football2.html',
         controller: 'Football2Ctrl'
     });
+$stateProvider.state('footballBills', {
+        url: "/footballBills",
+        templateUrl: 'html/footballBills.html',
+        controller: 'FootballBillsCtrl'
+    });
+$stateProvider.state('footballBillDetail', {
+        url: "/footballBillDetail/:index",
+        templateUrl: 'html/footballBillDetail.html',
+        controller: 'FootballBillDetailCtrl'
+    });
 $urlRouterProvider.otherwise('/menu');
 }]);
 
