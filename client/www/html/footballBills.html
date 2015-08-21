@@ -2,7 +2,7 @@
 <ion-content padding="true" class="text-center">
 <ion-list>
 <ion-item ng-repeat="fb in fbills" class="item-input-inset">
-<h2 style="width:70%">{{fb.match_count}}场比赛,共{{fb.bet_count}}注,{{fb.match_count==fb.finished_match_count?'已完成':'未完成'}}</h2>
+<h2 style="width:70%">{{fb.match_count}}场比赛,共{{fb.bet_count}}注,{{fb.match_count==fb.finished_match_count?'已完成':'未完成'}},{{fb.is_payed?'已付款':'未付款'}}</h2>
 <button class="button button-positive" ng-click="showDetail($index)" style="width:30%">查看</button>
 </ion-item>
 </ion-list>

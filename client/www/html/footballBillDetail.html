@@ -1,12 +1,24 @@
-<ion-view view-title="足彩订单">
+<ion-view view-title="订单详情">
 <ion-nav-buttons side="right">
-<button class="button button-positive" ng-disabled="{{fbill.is_payed}}" ng-click="pay()">付款</button>
+<button class="button button-positive" ng-disabled="fbill.is_payed" ng-click="pay()">付款</button>
 </ion-nav-buttons>
 <ion-content padding="true">
 <div class="list">
     <a class="item">
+        <h2>是否已付款</h1>
+        <p>{{fbill.is_payed?'是':'否'}}</p>
+    </a>
+    <a class="item">
+        <h2>是否已结束</h1>
+        <p>{{fbill.match_count==fbill.finished_match_count?'是':'否'}}</p>
+    </a>
+    <a class="item">
         <h2>购买时间</h1>
         <p>{{fbill.time}}</p>
+    </a>
+    <a class="item">
+        <h2>比赛场数</h1>
+        <p>{{fbill.match_count}}</p>
     </a>
     <a class="item">
         <h2>串关方式</h1>
@@ -25,23 +37,11 @@
         <p>{{2*fbill.bet_count*fbill.multiple}}元</p>
     </a>
     <a class="item">
-        <h2>是否已付款</h1>
-        <p>{{fbill.is_payed?'是':'否'}}</p>
-    </a>
-    <a class="item">
         <h2>奖金</h1>
         <p>{{fbill.bonus}}元</p>
     </a>
     <a class="item">
-        <h2>是否已结束</h1>
-        <p>{{fbill.match_count==fbill.finished_match_count?'是':'否'}}</p>
-    </a>
-    <a class="item">
-        <h2>比赛场数</h1>
-        <p>{{fbill.match_count}}</p>
-    </a>
-    <a class="item">
-        <h2>比赛信息</h1>
+        <h2>购买内容</h1>
         <h4 ng-repeat="match in fbill.matches">{{match.home}} VS {{match.away}}
             <p>{{match.selectedOptions}}</p>
         </h4>

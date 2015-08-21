@@ -274,8 +274,8 @@ app.controller('FootballBillsCtrl',['$scope','$state','$http',
         };
     }]);
 
-app.controller('FootballBillDetailCtrl',['$scope','$state','$ionicPopup',
-    function($scope,$state,$ionicPopup){
+app.controller('FootballBillDetailCtrl',['$scope','$state','$ionicPopup','$http',
+    function($scope,$state,$ionicPopup,$http){
         index=$state.params['index'];
         $scope.fbill=fbills[index];
 
@@ -283,11 +283,21 @@ app.controller('FootballBillDetailCtrl',['$scope','$state','$ionicPopup',
             money=2*$scope.fbill.bet_count*$scope.fbill.multiple;
             $ionicPopup.confirm({
                 title: '确认付款',
-                template: '是否确认付款'+money+'元'
+                template: '是否确认付款'+money+'元？'
             }).then(function(yes){
                 if(yes){
-                    id=$scope.fbill.id;
-                    alert(yes);
+                    billid=$scope.fbill.id;
+                    payInfo={};
+                    payInfo.billid=billid;
+                    payInfo.email=acct.email;
+                    payInfo.password=acct.password;
+                    myhttp($http,server+'/football/payFootball',payInfo,function(data){
+                        $scope.fbill.is_payed=true
+                        $ionicPopup.alert({
+                            title: '付款成功',
+                            template: '付款成功！'
+                        });
+                    });
                 }
             });
         };

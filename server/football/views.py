@@ -116,3 +116,59 @@ def getFootballBills(request):
     s=json.dumps(data)
     r.write(s)
     return r
+
+def payFootball(request):
+    r = HttpResponse()
+    r['Access-Control-Allow-Origin'] = '*'
+    data = {}
+
+    print request.body
+    params = json.loads(request.body)
+    email=params.get('email')
+    password=params.get('password')
+    billid=params.get('billid')
+    accts=Account.objects.filter(email=email,password=password)
+    if len(accts)!=1:
+        data['errmsg']='user error'
+        s=json.dumps(data)
+        r.write(s)
+        return r
+    acct=accts[0]
+    bills=FootballBill.objects.filter(acct=acct,id=billid)
+    if len(bills)!=1:
+        data['errmsg']='bill id error'
+        s=json.dumps(data)
+        r.write(s)
+        return r
+
+    bill=bills[0]
+    if bill.is_payed:
+        data['errmsg']='already payed'
+        s=json.dumps(data)
+        r.write(s)
+        return r
+
+    money=2*bill.bet_count*bill.multiple
+    balancef=acct.balance_fixed
+    balanceu=acct.balance_unfixed
+    if money>balancef+balanceu:
+        data['errmsg']='no enough money'
+        s=json.dumps(data)
+        r.write(s)
+        return r
+    
+    if balancef>=money:
+        balancef=balancef-money
+    else:
+        balanceu-=money-balancef
+        balancef=0
+    acct.balance_fixed=balancef
+    acct.balance_unfixed=balanceu
+    acct.save()
+    bill.is_payed=True
+    bill.save()
+
+    data['errmsg']='success'
+    s=json.dumps(data)
+    r.write(s)
+    return r
