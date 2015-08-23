@@ -111,13 +111,6 @@ app.controller('FootballCtrl',['$scope','$state','$http','$ionicModal',
             {title:'半全场',indices:[[14,15,16],[17,18,19],[20,21,22]]},
             {title:'全场比分',indices:[[23,24,25,26,27,28],[29,30,31,32,33,34],[35],[36,37,38,39],[40],[41,42,43,44,45,46],[47,48,49,50,51,52],[53]]}
         ];
-        //$scope.range=function(n){
-        //    r=[];
-        //    for(i=0;i<n;i++){
-        //        r.push(i);
-        //    }
-        //    return r;
-        //};
         $scope.labels=['胜','平','负','让球胜','让球平','让球负','0','1','2','3','4','5','6','7+','胜胜','胜平','胜负','平胜','平平','平负','负胜','负平','负负',
                       '1:0','2:0','2:1','3:0','3:1','3:2','4:0','4:1','4:2','5;0','5:1','5:2','胜其它',
                       '0:0','1:1','2:2','3:3','平其它',
@@ -292,7 +285,7 @@ app.controller('FootballBillDetailCtrl',['$scope','$state','$ionicPopup','$http'
                     payInfo.email=acct.email;
                     payInfo.password=acct.password;
                     myhttp($http,server+'/football/payFootball',payInfo,function(data){
-                        $scope.fbill.is_payed=true
+                        $scope.fbill.is_payed=true;
                         $ionicPopup.alert({
                             title: '付款成功',
                             template: '付款成功！'

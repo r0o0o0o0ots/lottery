@@ -11,6 +11,7 @@ class Match(models.Model):
     CRS=models.CharField(max_length=5,default='x:x')
     TTG=models.PositiveSmallIntegerField(default=0)
     HFT=models.PositiveSmallIntegerField(default=0)
+    mcode=models.CharField(max_length=10,default='')
 
 class Odd(models.Model):
     match=models.ForeignKey(Match)
