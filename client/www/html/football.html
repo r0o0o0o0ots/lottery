@@ -8,7 +8,7 @@
 <ion-list>
 <ion-item ng-repeat="match in matches">
     <h2>{{match['home']}} <i>VS</i> {{match['away']}}</h1>
-    <button class="button button-block" ng-class="{'button-positive': matchSelected($index)}" ng-click="showOptions($index)">{{match.selectedn?'已选择'+match.selectedn+'项':'点击选择购买项'}}</button>
+    <button class="button button-block" ng-class="{'button-balanced': matchSelected($index)}" ng-click="showOptions($index)">{{options2text(index)||'请选择'}}</button>
 </ion-item>
 </ion-list>
 </ion-content>

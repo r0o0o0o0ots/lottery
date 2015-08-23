@@ -161,8 +161,11 @@ app.controller('FootballCtrl',['$scope','$state','$http','$ionicModal',
         };
 
 
+        $scope.options2text=function(index){
+            return 'a';
+        };
         $scope.matchSelected=function(index){
-            return $scope.matches[index].selectedn!==undefined;
+            return $scope.matches[index].selectedOptions!==undefined;
         };
         $scope.goNext=function(){
             matches=$scope.matches;
