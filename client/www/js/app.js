@@ -33,12 +33,13 @@ $stateProvider.state('football', {
         controller: 'FootballCtrl'
     });
 $stateProvider.state('football2', {
+        cache:false,
         url: "/football2",
         templateUrl: 'html/football2.html',
         controller: 'Football2Ctrl'
     });
 $stateProvider.state('footballBills', {
-        url: "/footballBills",
+        url: "/footballBills/:forward",
         templateUrl: 'html/footballBills.html',
         controller: 'FootballBillsCtrl'
     });

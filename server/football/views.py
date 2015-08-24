@@ -107,7 +107,7 @@ def getFootballBills(request):
         fbds=FootballBillDetail.objects.filter(bill=bill)
         matches=[]
         for fbd in fbds:
-            matches.append({'home':fbd.match.home,'away':fbd.match.away,'selectedOptions':fbd.content})
+            matches.append({'home':fbd.match.home,'away':fbd.match.away,'handicap':fbd.match.handicap,'selectedOptions':fbd.content})
         billInfo['matches']=matches
         billsInfo.append(billInfo)
 

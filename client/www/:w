@@ -61,7 +61,7 @@ app.controller('MenuCtrl',['$scope','$state',
             //    $state.go('signin',{next:'football'});
             //}
             //else{
-                $state.go('football');
+                $state.go('football',{},{reload:true});
             //}
         };
     }]);
@@ -101,7 +101,6 @@ app.controller('SignupCtrl',['$scope','$http','$cordovaToast','$state','$ionicHi
                     backBackViewId=$ionicHistory.backView()['backViewId'];
                     backBackView=$ionicHistory.viewHistory()['views'][backBackViewId];
                     $ionicHistory.currentView(backBackView);
-                    $ionicHistory.clearCache();
                     $state.go(next,{},{location:'replace'});
                 }
             });
@@ -234,16 +233,6 @@ app.controller('Football2Ctrl',['$scope','$state','$http','$ionicModal','$ionicH
         $scope.confirmComb=function(){
             $scope.combModal.hide();
         };
-        $scope.selectedCombsText=function(){
-            var i;
-            var selectedCombs=[];
-            for(i=0;i<$scope.combs.length;i++){
-                if($scope.combs[i].selected){
-                    selectedCombs.push($scope.combs[i].num);
-                }
-            }
-            return combs2text(selectedCombs);
-        };
 
         $scope.createBill=function(){
             if($scope.selectedMatches.length===0){
@@ -290,7 +279,6 @@ app.controller('Football2Ctrl',['$scope','$state','$http','$ionicModal','$ionicH
                     backBackViewId=$ionicHistory.backView()['backViewId'];
                     backBackView=$ionicHistory.viewHistory()['views'][backBackViewId];
                     $ionicHistory.currentView(backBackView);
-                    $ionicHistory.clearCache();
                     $state.go('footballBills',{forward:true},{location:'replace'});
                 });
             });
@@ -318,9 +306,10 @@ app.controller('FootballBillDetailCtrl',['$scope','$state','$ionicPopup','$http'
         for(i=0;i<$scope.fbill.matches.length;i++){
             options=JSON.parse($scope.fbill.matches[i].selectedOptions);
             $scope.fbill.matches[i].selectedOptionsText=options2text(options);
+            combs=JSON.parse($scope.fbill.matches[i].comb_type);
+            alert(combs);
+            $scope.fbill.matches[i].combsText=combs2text(combs);
         }
-        combs=JSON.parse($scope.fbill.comb_type);
-        $scope.fbill.combsText=combs2text(combs);
 
         $scope.pay=function(){
             money=2*$scope.fbill.bet_count*$scope.fbill.multiple;

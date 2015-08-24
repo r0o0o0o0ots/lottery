@@ -6,14 +6,14 @@
 <h1>你已选择{{selectedMatches.length}}场比赛</h1>
 <ion-list>
 <ion-item ng-repeat="match in selectedMatches">
-<h2>{{match.home}} <i>VS</i> {{match.away}}</h2>
+<h2>{{match.home}} <i>VS</i> {{match.away}} ({{match.handicap}})</h2>
 <p>已购买{{match.selectedOptions.length}}项</p>
-<p>{{match.selectedOptions}}</p>
+<p>{{match.selectedOptionsText}}</p>
 </ion-item>
 </ion-list>
 </ion-content>
 <ion-footer-bar class="bar bar-footer bar-calm item-input-inset" style="float:right">
-<button class="button button-positive" style="width:30%" ng-click="showComb()">选择串关方式</button>
+<button class="button button-positive" style="width:30%" ng-click="showComb()">{{selectedCombsText()||'选择串关方式'}}</button>
 <label style="width:20%;text-align:right">倍数: </label>
 <button class="button button-positive" style="width:10%;" ng-click="minus()">-</button>
 <input type="number" min="1" step="1" style="width:30%" ng-model="multiple">

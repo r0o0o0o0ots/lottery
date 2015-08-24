@@ -5,13 +5,16 @@ from account.models import Account
 class Match(models.Model):
     home=models.CharField(max_length=50)
     away=models.CharField(max_length=50)
+    SN=models.CharField(max_length=10)
+    event=models.CharField(max_length=20)
+    time=models.DateTimeField()
     handicap=models.CharField(max_length=3)
     HAD=models.CharField(max_length=1,default='x')
     HHAD=models.CharField(max_length=1,default='x')
     CRS=models.CharField(max_length=5,default='x:x')
     TTG=models.PositiveSmallIntegerField(default=0)
     HFT=models.PositiveSmallIntegerField(default=0)
-    mcode=models.CharField(max_length=10,default='')
+    mcode=models.CharField(max_length=10)
 
 class Odd(models.Model):
     match=models.ForeignKey(Match)

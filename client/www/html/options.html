@@ -11,7 +11,7 @@
                 <div ng-repeat="row in c['indices']">
                         <div class="button-bar">
                             <a ng-repeat="index in row" class="button button-small button-block" ng-class="{'button-positive': isOptionSelected({{index}})}" ng-click="optionPressed({{index}})">
-                                <font size="3">{{labels[index]}}</font><br><font size="1">{{match['odd'][index]}}</font>
+                                <font size="3">{{optionText[index]}}</font><br><font size="1">{{match['odd'][index]}}</font>
                             </a>
                         </div>
                 </div>
