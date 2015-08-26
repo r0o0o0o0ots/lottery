@@ -311,8 +311,8 @@ app.controller('FootballBillsCtrl',['$scope','$state','$http',
         };
     }]);
 
-app.controller('FootballBillDetailCtrl',['$scope','$state','$ionicPopup','$http',
-    function($scope,$state,$ionicPopup,$http){
+app.controller('FootballBillDetailCtrl',['$scope','$state','$ionicPopup','$http','$ionicHistory',
+    function($scope,$state,$ionicPopup,$http,$ionicHistory){
         index=$state.params['index'];
         $scope.fbill=fbills[index];
         for(i=0;i<$scope.fbill.matches.length;i++){
@@ -339,6 +339,28 @@ app.controller('FootballBillDetailCtrl',['$scope','$state','$ionicPopup','$http'
                         $ionicPopup.alert({
                             title: '付款成功',
                             template: '付款成功！'
+                        });
+                    });
+                }
+            });
+        };
+
+        $scope.del=function(){
+            $ionicPopup.confirm({
+                title: '确认删除订单',
+                template: '是否确认删除订单？'
+            }).then(function(yes){
+                if(yes){
+                    delInfo={};
+                    delInfo.email=acct.email;
+                    delInfo.password=acct.password;
+                    delInfo.billid=$scope.fbill.id;
+                    myhttp($http,server+'/football/delFootballBill',delInfo,function(data){
+                        $ionicPopup.alert({
+                            title: '删除成功',
+                            template: '删除成功！'
+                        }).then(function(){
+                            $ionicHistory.goBack(-1);
                         });
                     });
                 }

@@ -46,6 +46,9 @@
             <p>{{match.selectedOptionsText}}</p>
         </h4>
     </a>
+    <a class="item" ng-show="!fbill.is_payed">
+        <button class="button button-block button-positive" ng-click="del()">删除订单</button>
+    </a>
 </div>
 </ion-content>
 </ion-view>

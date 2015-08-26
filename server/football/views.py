@@ -122,7 +122,6 @@ def payFootball(request):
     r['Access-Control-Allow-Origin'] = '*'
     data = {}
 
-    print request.body
     params = json.loads(request.body)
     email=params.get('email')
     password=params.get('password')
@@ -167,6 +166,46 @@ def payFootball(request):
     acct.save()
     bill.is_payed=True
     bill.save()
+
+    data['errmsg']='success'
+    s=json.dumps(data)
+    r.write(s)
+    return r
+
+def delFootballBill(request):
+    r = HttpResponse()
+    r['Access-Control-Allow-Origin'] = '*'
+    data = {}
+
+    params = json.loads(request.body)
+    email=params.get('email')
+    password=params.get('password')
+    billid=params.get('billid')
+    accts=Account.objects.filter(email=email,password=password)
+    if len(accts)!=1:
+        data['errmsg']='user error'
+        s=json.dumps(data)
+        r.write(s)
+        return r
+    acct=accts[0]
+    bills=FootballBill.objects.filter(acct=acct,id=billid)
+    if len(bills)!=1:
+        data['errmsg']='bill id error'
+        s=json.dumps(data)
+        r.write(s)
+        return r
+
+    bill=bills[0]
+    if bill.is_payed:
+        data['errmsg']='already payed, can not be deleted'
+        s=json.dumps(data)
+        r.write(s)
+        return r
+
+    fbds=FootballBillDetail.objects.filter(bill=bill)
+    for fbd in fbds:
+        fbd.delete()
+    bill.delete()
 
     data['errmsg']='success'
     s=json.dumps(data)
