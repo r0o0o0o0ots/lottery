@@ -39,14 +39,26 @@ $stateProvider.state('football2', {
         controller: 'Football2Ctrl'
     });
 $stateProvider.state('footballBills', {
+        cache:false,
         url: "/footballBills/:forward",
         templateUrl: 'html/footballBills.html',
         controller: 'FootballBillsCtrl'
     });
 $stateProvider.state('footballBillDetail', {
-        url: "/footballBillDetail/:index",
+        url: "/footballBillDetail/:billid",
         templateUrl: 'html/footballBillDetail.html',
         controller: 'FootballBillDetailCtrl'
+    });
+$stateProvider.state('traditional', {
+        url: "/traditional/:type",
+        templateUrl: 'html/traditional.html',
+        controller: 'TraditionalCtrl'
+    });
+$stateProvider.state('traditionalConfirm', {
+        cache:false,
+        url: "/traditionalConfirm",
+        templateUrl: 'html/traditionalConfirm.html',
+        controller: 'TraditionalConfirmCtrl'
     });
 $urlRouterProvider.otherwise('/menu');
 }]);

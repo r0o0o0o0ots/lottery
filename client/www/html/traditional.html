@@ -1,0 +1,30 @@
+<ion-view view-title="传统足彩">
+<ion-nav-buttons side="right">
+    <button class="button button-positive" ng-click="goNext()">下一步</button>
+</ion-nav-buttons>
+<ion-content padding="true" class="text-center">
+<ion-refresher pulling-text="Pull to refresh..." on-refresh="doRefresh()">
+</ion-refresher>
+<h2>第{{SN}}期</h2>
+<h3>截止时间：{{deadline}}</h3>
+<label class="item item-input item-select">
+    <div class="input-label">
+        类型
+    </div>
+    <select ng-model="traditional_info.type">
+        <option value="14">14场</option>
+        <option value="9">任选9</option>
+    </select>
+</label>
+<ion-list>
+<ion-item ng-repeat="match in matches">
+    <h2>{{match.home}} <i>VS</i> {{match.away}}</h2>
+    <div class="button-bar">
+        <button class="button button-small" ng-class="{'button-positive': isSelected($index,0)}" ng-click="press($index,0)"><font size="3">胜</font><br><font size="1">{{match.odd[0]}}</font></button>
+        <button class="button button-small" ng-class="{'button-positive': isSelected($index,1)}" ng-click="press($index,1)"><font size="3">平</font><br><font size="1">{{match.odd[1]}}</font></button>
+        <button class="button button-small" ng-class="{'button-positive': isSelected($index,2)}" ng-click="press($index,2)"><font size="3">负</font><br><font size="1">{{match.odd[2]}}</font></button>
+    </div>
+</ion-item>
+</ion-list>
+</ion-content>
+</ion-view>

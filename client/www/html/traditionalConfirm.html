@@ -1,0 +1,22 @@
+<ion-view view-title="确认订单">
+<ion-nav-buttons side="right">
+    <button class="button button-positive" ng-click="createBill()">下单</button>
+</ion-nav-buttons>
+<ion-content padding="true" class="text-center">
+<h2>第{{SN}}期</h2>
+<h3>截止时间：{{deadline}}</h3>
+<h4>类型：{{type_text}}</h2>
+<ion-list>
+<ion-item ng-repeat="match in matches" ng-show="match.selected[0]||match.selected[1]||match.selected[2]">
+<h2>{{match.home}} <i>VS</i> {{match.away}}</h2>
+<p>{{selected2text(match.selected)}}</p>
+</ion-item>
+</ion-list>
+</ion-content>
+<ion-footer-bar class="bar bar-footer bar-calm item-input-inset">
+<label style="width:25%;text-align:center">倍数: </label>
+<button class="button button-positive" style="width:10%;" ng-click="minus()">-</button>
+<input type="number" min="1" step="1" style="width:30%" ng-model="multiple">
+<button class="button button-positive" style="width:10%" ng-click="plus()">+</button>
+</ion-footer-bar>
+</ion-view>

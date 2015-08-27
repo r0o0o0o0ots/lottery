@@ -40,7 +40,7 @@ class FootballBill(models.Model):
 class FootballBillDetail(models.Model):
     bill=models.ForeignKey(FootballBill)
     match=models.ForeignKey(Match)
-    content=models.CharField(max_length=54)
+    content=models.CharField(max_length=200)
 
 #class FootballBet(models.Model):
 #    bill=models.ForeignKey(FootballBill)
@@ -53,14 +53,22 @@ class FootballBillDetail(models.Model):
 #    match=models.ForeignKey(Match)
 #    content=models.PositiveSmallIntegerField()
 
-class Matches14Game(models.Model):
-    matches=models.CharField(max_length=200)
-    results=models.CharField(max_length=14)
+class TraditionalGame(models.Model):
+    SN=models.CharField(max_length=10)
+    deadline=models.DateTimeField()
+    results=models.CharField(max_length=14,default='x')
 
-class Matches14Bill(models.Model):
-    game=models.ForeignKey(Matches14Game)
-    content=models.CharField(max_length=60)
+class TraditionalMatches(models.Model):
+    game=models.ForeignKey(TraditionalGame)
+    match=models.ForeignKey(Match)
 
-class Matches9Bill(models.Model):
-    game=models.ForeignKey(Matches14Game)
+class TraditionalBill(models.Model):
+    acct=models.ForeignKey(Account)
+    type=models.CharField(max_length=5)
+    game=models.ForeignKey(TraditionalGame)
     content=models.CharField(max_length=60)
+    bonus=models.DecimalField(max_digits=10,decimal_places=2,default=0.0)
+
+#class Matches9Bill(models.Model):
+#    game=models.ForeignKey(Matches14Game)
+#    content=models.CharField(max_length=60)

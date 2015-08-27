@@ -3,7 +3,12 @@ var acct={};
 acct.email='a@b.com';
 acct.password='qwe';
 var matches;
-var fbbills;
+var traditional_info;
+
+var traditional_type_texts={
+    '14':'14场',
+    '9':'任选9'
+};
 var optionText=['胜','平','负','让球胜','让球平','让球负','0','1','2','3','4','5','6','7+','胜胜','胜平','胜负','平胜','平平','平负','负胜','负平','负负',
               '1:0','2:0','2:1','3:0','3:1','3:2','4:0','4:1','4:2','5;0','5:1','5:2','胜其它',
               '0:0','1:1','2:2','3:3','平其它',
@@ -23,6 +28,16 @@ function combs2text(combs){
     var i;
     for(i=0;i<combs.length;i++){
         texts.push(combs[i]+'串1');
+    }
+    return texts.join('/');
+}
+
+function selected2text(selected){
+    texts=[];
+    for(i=0;i<selected.length;i++){
+        if(selected[i]){
+            texts.push(optionText[i]);
+        }
     }
     return texts.join('/');
 }
@@ -57,12 +72,20 @@ app.controller('MenuCtrl',['$scope','$state',
             }
         };
         $scope.football=function(){
-            //if(acct===undefined){
-            //    $state.go('signin',{next:'football'});
-            //}
-            //else{
+            if(acct===undefined){
+                $state.go('signin',{next:'football'});
+            }
+            else{
                 $state.go('football');
-            //}
+            }
+        };
+        $scope.matches14=function(){
+            if(acct===undefined){
+                $state.go('signin',{next:'football'});
+            }
+            else{
+                $state.go('traditional',{type:'14'});
+            }
         };
     }]);
 
@@ -186,7 +209,7 @@ app.controller('FootballCtrl',['$scope','$state','$http','$ionicModal',
         };
         $scope.goNext=function(){
             matches=$scope.matches;
-            $state.go('football2',{},{reload:true});
+            $state.go('football2');
         };
         $scope.doRefresh=function(){
             myhttp($http,server+'/football/getMatchInfo','',function(data){
@@ -300,27 +323,28 @@ app.controller('Football2Ctrl',['$scope','$state','$http','$ionicModal','$ionicH
 app.controller('FootballBillsCtrl',['$scope','$state','$http',
     function($scope,$state,$http){
         myhttp($http,server+'/football/getFootballBills',{email:acct.email,password:acct.password},function(data){
-            fbills=data.bills.reverse();
-            $scope.fbills=fbills;
             if($state.params['forward']=='true'){
-                $state.go('footballBillDetail',{index:0});
+                $state.go('footballBillDetail',{billid:$scope.fbills[0].id});
             }
+            $scope.fbills=data.bills.reverse();
         });
         $scope.showDetail=function(index){
-            $state.go('footballBillDetail',{index:index});
+            $state.go('footballBillDetail',{billid:$scope.fbills[index].id});
         };
     }]);
 
 app.controller('FootballBillDetailCtrl',['$scope','$state','$ionicPopup','$http','$ionicHistory',
     function($scope,$state,$ionicPopup,$http,$ionicHistory){
-        index=$state.params['index'];
-        $scope.fbill=fbills[index];
-        for(i=0;i<$scope.fbill.matches.length;i++){
-            options=JSON.parse($scope.fbill.matches[i].selectedOptions);
-            $scope.fbill.matches[i].selectedOptionsText=options2text(options);
-        }
-        combs=JSON.parse($scope.fbill.comb_type);
-        $scope.fbill.combsText=combs2text(combs);
+        billid=$state.params['billid'];
+        myhttp($http,server+'/football/getFootballBillDetail',{email:acct.email,password:acct.password,billid:billid},function(data){
+            $scope.fbill=data.bill;
+            for(i=0;i<$scope.fbill.matches.length;i++){
+                options=JSON.parse($scope.fbill.matches[i].selectedOptions);
+                $scope.fbill.matches[i].selectedOptionsText=options2text(options);
+            }
+            combs=JSON.parse($scope.fbill.comb_type);
+            $scope.fbill.combsText=combs2text(combs);
+        });
 
         $scope.pay=function(){
             money=2*$scope.fbill.bet_count*$scope.fbill.multiple;
@@ -365,5 +389,73 @@ app.controller('FootballBillDetailCtrl',['$scope','$state','$ionicPopup','$http'
                     });
                 }
             });
+        };
+    }]);
+
+app.controller('TraditionalCtrl',['$scope','$state','$ionicPopup','$http','$ionicHistory',
+    function($scope,$state,$ionicPopup,$http,$ionicHistory){
+        $scope.traditional_info={};
+        $scope.traditional_info.type=$state.params.type;
+        $scope.press=function(m,i){
+            $scope.matches[m].selected[i]=!$scope.matches[m].selected[i];
+        };
+        $scope.isSelected=function(m,i){
+            return $scope.matches[m].selected[i];
+        };
+        $scope.goNext=function(){
+            var n=0;
+            var i;
+            for(i=0;i<$scope.matches.length;i++){
+                selected=$scope.matches[i].selected;
+                if(selected[0]||selected[1]||selected[2]){
+                    n++;
+                }
+            }
+            if(n<parseInt($scope.traditional_info.type,10)){
+                $ionicPopup.alert({
+                    title:'错误',
+                    template:'请至少选择'+$scope.traditional_info.type+'场'
+                });
+            }
+            else{
+                traditional_info=$scope.traditional_info;
+                traditional_info.SN=$scope.SN;
+                traditional_info.deadline=$scope.deadline;
+                traditional_info.matches=$scope.matches;
+                $state.go("traditionalConfirm");
+            }
+        };
+        $scope.doRefresh=function(){
+            myhttp($http,server+'/football/getTraditionalInfo',{email:acct.email,password:acct.password},function(data){
+                $scope.SN=data.SN;
+                $scope.deadline=data.deadline;
+                $scope.matches=data.matches;
+                for(i=0;i<14;i++){
+                    $scope.matches[i].selected=[false,false,false];
+                }
+            });
+        };
+        $scope.doRefresh();
+    }]);
+
+app.controller('TraditionalConfirmCtrl',['$scope','$state','$ionicPopup','$http','$ionicHistory',
+    function($scope,$state,$ionicPopup,$http,$ionicHistory){
+        $scope.type=traditional_info.type;
+        $scope.type_text=traditional_type_texts[$scope.type];
+        $scope.SN=traditional_info.SN;
+        $scope.deadline=traditional_info.deadline;
+        $scope.matches=traditional_info.matches;
+        $scope.selected2text=selected2text;
+
+        $scope.multiple=1;
+        $scope.plus=function(){
+            if($scope.multiple<99){
+                $scope.multiple+=1;
+            }
+        };
+        $scope.minus=function(){
+            if($scope.multiple>1){
+                $scope.multiple-=1;
+            }
         };
     }]);
