@@ -3,10 +3,10 @@
     <button class="button button-positive" ng-click="goNext()">下一步</button>
 </ion-nav-buttons>
 <ion-content padding="true" class="text-center">
-<ion-refresher pulling-text="Pull to refresh..." on-refresh="doRefresh()">
+<ion-refresher pulling-text="下拉刷新" on-refresh="doRefresh()">
 </ion-refresher>
-<h2>第{{SN}}期</h2>
-<h3>截止时间：{{deadline}}</h3>
+<h2>第{{traditional_info.SN}}期</h2>
+<h3>截止时间：{{traditional_info.deadline}}</h3>
 <label class="item item-input item-select">
     <div class="input-label">
         类型
@@ -17,7 +17,7 @@
     </select>
 </label>
 <ion-list>
-<ion-item ng-repeat="match in matches">
+<ion-item ng-repeat="match in traditional_info.matches">
     <h2>{{match.home}} <i>VS</i> {{match.away}}</h2>
     <div class="button-bar">
         <button class="button button-small" ng-class="{'button-positive': isSelected($index,0)}" ng-click="press($index,0)"><font size="3">胜</font><br><font size="1">{{match.odd[0]}}</font></button>

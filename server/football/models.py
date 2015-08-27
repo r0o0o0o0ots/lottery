@@ -65,6 +65,7 @@ class TraditionalMatches(models.Model):
 class TraditionalBill(models.Model):
     acct=models.ForeignKey(Account)
     type=models.CharField(max_length=5)
+    multiple=models.PositiveSmallIntegerField(default=1)
     game=models.ForeignKey(TraditionalGame)
     content=models.CharField(max_length=60)
     bonus=models.DecimalField(max_digits=10,decimal_places=2,default=0.0)

@@ -292,11 +292,11 @@ def getTraditionalInfo(request):
         info['id']=match.id
         info['home']=match.home
         info['away']=match.away
-        info['handicap']=match.handicap
         info['odd']=odd.odd.split(' ')[:3]
         matches_info.append(info)
 
     data['errmsg']='success'
+    data['id']=game.id
     data['SN']=game.SN
     data['deadline']=game.deadline.strftime('%Y-%m-%d %H:%M:%S')
     data['matches']=matches_info
@@ -304,3 +304,38 @@ def getTraditionalInfo(request):
     r.write(s)
     return r
 
+def createTraditionalBill(request):
+    r = HttpResponse()
+    r['Access-Control-Allow-Origin'] = '*'
+    data = {}
+
+    params = json.loads(request.body)
+    email=params.get('email')
+    password=params.get('password')
+    accts=Account.objects.filter(email=email,password=password)
+    if len(accts)!=1:
+        data['errmsg']='user error'
+        s=json.dumps(data)
+        r.write(s)
+        return r
+    acct=accts[0]
+
+    id=params.get('id')
+    multiple=params.get('multiple')
+    type=params.get('type')
+    matches=params.get('matches')
+
+    bill=TraditionalBill()
+    bill.acct=acct
+    bill.type=type
+    bill.multiple=multiple
+    game=TraditionalGame.objects.get(pk=id)
+    bill.game=game
+    bill.content=json.dumps(matches)
+    bill.save()
+
+    data['errmsg']='success'
+    data['billid']=bill.id
+    s=json.dumps(data)
+    r.write(s)
+    return r

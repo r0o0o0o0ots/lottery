@@ -8,7 +8,9 @@ urlpatterns = [
             url(r'getFootballBillDetail', views.getFootballBillDetail, name='getFootballBillDetail' ),
             url(r'payFootball', views.payFootball, name='payFootball' ),
             url(r'delFootballBill', views.delFootballBill, name='delFootballBill' ),
+
             url(r'getTraditionalInfo', views.getTraditionalInfo, name='getTraditionalInfo' ),
+            url(r'createTraditionalBill', views.createTraditionalBill, name='createTraditionaleBill' ),
 
 ]
 
