@@ -1,15 +1,18 @@
 <ion-view view-title="主菜单">
 <ion-content padding="true" class="text-center">
 <div class="button-bar">
-<a class="button button-positive" href="#/signin/prev">登陆</a>
-    <button class="button button-positive" ng-click="accountDetail()">账户详情</button>
-    <a class="button button-positive" href="#/footballBills/false">查看订单</a>
+<a class="button button-positive" href="#/signin">登陆</a>
+    <button class="button button-positive" ng-click="go('accountDetail')">账户详情</button>
+    <button class="button button-positive" ng-click="">高频彩</button>
 </div>
 <div class="button-bar">
-    <button class="button button-positive" ng-click="football()">足彩</button>
-    <button class="button button-positive" ng-click="matches14()">14场</button>
-    <button class="button button-positive" ng-click="">任选9</button>
-    <button class="button button-positive" ng-click="">高频彩</button>
+    <button class="button button-positive" ng-click="go('football')">足彩</button>
+    <button class="button button-positive" ng-click="go('footballBills')">查看订单</button>
+</div>
+<div class="button-bar">
+    <button class="button button-positive" ng-click="go('traditional',{type:14})">14场</button>
+    <button class="button button-positive" ng-click="go('traditional',{type:9})">任选9</button>
+    <button class="button button-positive" ng-click="go('traditionalBills')">查看订单</button>
 </div>
 </ion-content>
 </ion-view>

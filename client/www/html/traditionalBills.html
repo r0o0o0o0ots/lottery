@@ -1,0 +1,10 @@
+<ion-view view-title="传统足彩订单">
+<ion-content padding="true" class="text-center">
+<ion-list>
+<ion-item ng-repeat="bill in bills" class="item-input-inset">
+<h2 style="width:80%">{{type_texts[bill.type]}},{{bill.bet_count}}注,{{bill.finished?'已完成':'未完成'}},{{bill.is_payed?'已付款':'未付款'}}</h2>
+<button class="button button-small button-positive" ng-click="showDetail($index)" style="width:20%">查看</button>
+</ion-item>
+</ion-list>
+</ion-content>
+</ion-view>

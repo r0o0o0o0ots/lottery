@@ -1,7 +1,7 @@
 var server="http://127.0.0.1:8000";
-var acct={};
-acct.email='a@b.com';
-acct.password='qwe';
+var acct;
+//acct.email='a@b.com';
+//acct.password='qwe';
 var matches;
 var traditional_info;
 
@@ -53,50 +53,60 @@ function myhttp($http,url,data,successfunc){
 
 app.controller('MenuCtrl',['$scope','$state',
     function($scope,$state){
-        $scope.accountDetail=function(){
+        $scope.go=function(next,params){
             if(acct===undefined){
-                $state.go('signin',{next:'accountDetail'});
+                $state.go('signin');
             }
             else{
-                $state.go('accountDetail');
+                $state.go(next,params);
             }
         };
-        $scope.football=function(){
-            if(acct===undefined){
-                $state.go('signin',{next:'football'});
-            }
-            else{
-                $state.go('football');
-            }
-        };
-        $scope.matches14=function(){
-            if(acct===undefined){
-                $state.go('signin',{next:'football'});
-            }
-            else{
-                $state.go('traditional',{type:'14'});
-            }
-        };
+        //$scope.accountDetail=function(){
+        //    if(acct===undefined){
+        //        $state.go('signin',{next:'accountDetail'});
+        //    }
+        //    else{
+        //        $state.go('accountDetail');
+        //    }
+        //};
+        //$scope.football=function(){
+        //    if(acct===undefined){
+        //        $state.go('signin',{next:'football'});
+        //    }
+        //    else{
+        //        $state.go('football');
+        //    }
+        //};
+        //$scope.matches14=function(){
+        //    alert();
+        //    //if(acct===undefined){
+        //    //    $state.go('signin',{next:'football'});
+        //    //}
+        //    //else{
+        //        $state.go('/traditional/14');
+        //    //}
+        //};
+        //$scope.matches9=function(){
+        //    if(acct===undefined){
+        //        $state.go('signin',{next:'football'});
+        //    }
+        //    else{
+        //        $state.go('traditional',{type:'9'});
+        //    }
+        //};
     }]);
 
 app.controller('SigninCtrl',['$scope','$http','$cordovaToast','$state','$ionicHistory',
     function($scope,$http,$cordovaToast,$state,$ionicHistory){
         $scope.signinData = {};
         $scope.signin=function(){
-            data=myhttp($http,server+'/account/signin',{email:$scope.signinData.email,password:$scope.signinData.password},function(data){
+            data=myhttp($http,server+'/account/signin',$scope.signinData,function(data){
                 acct=data;
-                next=$state.params['next'];
-                if(next=='prev'){
-                    $ionicHistory.goBack(-1);
-                }
-                else{
-                    $ionicHistory.currentView($ionicHistory.backView());
-                    $state.go(next,{},{location:'replace'});
-                }
+                $ionicHistory.goBack(-1);
             });
         };
         $scope.signinToSignup=function(){
-            $state.go('signup',{next:$state.params['next']});
+            $state.go('signup');
         };
     }]);
 
@@ -106,17 +116,7 @@ app.controller('SignupCtrl',['$scope','$http','$cordovaToast','$state','$ionicHi
         $scope.signup=function(){
             myhttp($http,server+'/account/signup',$scope.signupData,function(data){
                 acct=data;
-                next=$state.params['next'];
-                if(next=='prev'){
-                    $ionicHistory.goBack(-2);
-                }
-                else{
-                    backBackViewId=$ionicHistory.backView()['backViewId'];
-                    backBackView=$ionicHistory.viewHistory()['views'][backBackViewId];
-                    $ionicHistory.currentView(backBackView);
-                    $ionicHistory.clearCache();
-                    $state.go(next,{},{location:'replace'});
-                }
+                $ionicHistory.goBack(-2);
             });
         };
         $scope.signupToSignin=function(){
@@ -199,10 +199,10 @@ app.controller('FootballCtrl',['$scope','$state','$http','$ionicModal',
         };
         $scope.goNext=function(){
             matches=$scope.matches;
-            $state.go('football2');
+            $state.go('footballConfirm');
         };
         $scope.doRefresh=function(){
-            myhttp($http,server+'/football/getMatchInfo','',function(data){
+            myhttp($http,server+'/football/getMatchInfo',{email:acct.email,password:acct.password},function(data){
                 $scope.matches=data['matches'];
                 $scope.$broadcast('scroll.refreshComplete');
             });
@@ -210,7 +210,7 @@ app.controller('FootballCtrl',['$scope','$state','$http','$ionicModal',
         $scope.doRefresh();
     }]);
 
-app.controller('Football2Ctrl',['$scope','$state','$http','$ionicModal','$ionicHistory','$ionicPopup',
+app.controller('FootballConfirmCtrl',['$scope','$state','$http','$ionicModal','$ionicHistory','$ionicPopup',
     function($scope,$state,$http,$ionicModal,$ionicHistory,$ionicPopup){
         $scope.selectedMatches=[];
         for(i=0;i<matches.length;i++){
@@ -304,7 +304,7 @@ app.controller('Football2Ctrl',['$scope','$state','$http','$ionicModal','$ionicH
                     backBackView=$ionicHistory.viewHistory()['views'][backBackViewId];
                     $ionicHistory.currentView(backBackView);
                     $ionicHistory.clearCache();
-                    $state.go('footballBills',{forward:true},{location:'replace'});
+                    $state.go('footballBillDetail',{billid:data.billid},{location:'replace'});
                 });
             });
         };
@@ -313,10 +313,10 @@ app.controller('Football2Ctrl',['$scope','$state','$http','$ionicModal','$ionicH
 app.controller('FootballBillsCtrl',['$scope','$state','$http',
     function($scope,$state,$http){
         myhttp($http,server+'/football/getFootballBills',{email:acct.email,password:acct.password},function(data){
-            if($state.params['forward']=='true'){
-                $state.go('footballBillDetail',{billid:$scope.fbills[0].id});
-            }
             $scope.fbills=data.bills.reverse();
+            //if($state.params['forward']=='true'){
+            //    $state.go('footballBillDetail',{billid:$scope.fbills[0].id});
+            //}
         });
         $scope.showDetail=function(index){
             $state.go('footballBillDetail',{billid:$scope.fbills[index].id});
@@ -408,11 +408,8 @@ app.controller('TraditionalCtrl',['$scope','$state','$ionicPopup','$http','$ioni
                 }
                 if(selectedOptions.length!==0){
                     n++;
-                    $scope.traditional_info.matches[i].selectedOptions=selectedOptions;
                 }
-                else{
-                    delete $scope.traditional_info.matches[i].selectedOptions;
-                }
+                $scope.traditional_info.matches[i].selectedOptions=selectedOptions;
             }
             if(n<parseInt($scope.traditional_info.type,10)){
                 $ionicPopup.alert({
@@ -431,6 +428,7 @@ app.controller('TraditionalCtrl',['$scope','$state','$ionicPopup','$http','$ioni
                 $scope.traditional_info.SN=data.SN;
                 $scope.traditional_info.deadline=data.deadline;
                 $scope.traditional_info.matches=data.matches;
+                $scope.$broadcast('scroll.refreshComplete');
             });
         };
         $scope.doRefresh();
@@ -476,12 +474,82 @@ app.controller('TraditionalConfirmCtrl',['$scope','$state','$ionicPopup','$http'
                 }
 
                 myhttp($http,server+'/football/createTraditionalBill',billInfo,function(data){
-                    backBackViewId=$ionicHistory.backView()['backViewId'];
-                    backBackView=$ionicHistory.viewHistory()['views'][backBackViewId];
-                    $ionicHistory.currentView(backBackView);
-                    $ionicHistory.clearCache();
-                    $state.go('traditionalBills',{forward:true},{location:'replace'});
+                    $ionicPopup.alert({
+                        title:'下单成功',
+                        template:'下单成功！'
+                    }).then(function(){
+                        backBackViewId=$ionicHistory.backView()['backViewId'];
+                        backBackView=$ionicHistory.viewHistory()['views'][backBackViewId];
+                        $ionicHistory.currentView(backBackView);
+                        $ionicHistory.clearCache();
+                        $state.go('traditionalBills',{forward:true},{location:'replace'});
+                    });
                 });
+            });
+        };
+    }]);
+
+app.controller('TraditionalBillsCtrl',['$scope','$state','$http',
+    function($scope,$state,$http){
+        $scope.type_texts=traditional_type_texts;
+        myhttp($http,server+'/football/getTraditionalBills',{email:acct.email,password:acct.password},function(data){
+            $scope.bills=data.bills.reverse();
+        });
+        $scope.showDetail=function(index){
+            $state.go('traditionalBillDetail',{billid:$scope.bills[index].id});
+        };
+    }]);
+
+app.controller('TraditionalBillDetailCtrl',['$scope','$state','$ionicPopup','$http','$ionicHistory',
+    function($scope,$state,$ionicPopup,$http,$ionicHistory){
+        $scope.options2text=options2text;
+        billid=$state.params.billid;
+        myhttp($http,server+'/football/getTraditionalBillDetail',{email:acct.email,password:acct.password,billid:billid},function(data){
+            $scope.bill=data.bill;
+        });
+
+        $scope.pay=function(){
+            money=2*$scope.bill.bet_count*$scope.bill.multiple;
+            $ionicPopup.confirm({
+                title: '确认付款',
+                template: '是否确认付款'+money+'元？'
+            }).then(function(yes){
+                if(yes){
+                    billid=$scope.bill.id;
+                    payInfo={};
+                    payInfo.billid=billid;
+                    payInfo.email=acct.email;
+                    payInfo.password=acct.password;
+                    myhttp($http,server+'/football/payTraditionalBill',payInfo,function(data){
+                        $scope.bill.is_payed=true;
+                        $ionicPopup.alert({
+                            title: '付款成功',
+                            template: '付款成功！'
+                        });
+                    });
+                }
+            });
+        };
+
+        $scope.del=function(){
+            $ionicPopup.confirm({
+                title: '确认删除订单',
+                template: '是否确认删除订单？'
+            }).then(function(yes){
+                if(yes){
+                    delInfo={};
+                    delInfo.email=acct.email;
+                    delInfo.password=acct.password;
+                    delInfo.billid=$scope.bill.id;
+                    myhttp($http,server+'/football/delTraditionalBill',delInfo,function(data){
+                        $ionicPopup.alert({
+                            title: '删除成功',
+                            template: '删除成功！'
+                        }).then(function(){
+                            $ionicHistory.goBack(-1);
+                        });
+                    });
+                }
             });
         };
     }]);

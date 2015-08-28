@@ -67,8 +67,11 @@ class TraditionalBill(models.Model):
     type=models.CharField(max_length=5)
     multiple=models.PositiveSmallIntegerField(default=1)
     game=models.ForeignKey(TraditionalGame)
-    content=models.CharField(max_length=60)
+    content=models.CharField(max_length=115)
+    bet_count=models.PositiveIntegerField()
     bonus=models.DecimalField(max_digits=10,decimal_places=2,default=0.0)
+    time=models.DateTimeField(auto_now=True)
+    is_payed=models.BooleanField(default=False)
 
 #class Matches9Bill(models.Model):
 #    game=models.ForeignKey(Matches14Game)

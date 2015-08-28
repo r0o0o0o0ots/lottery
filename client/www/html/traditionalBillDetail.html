@@ -1,0 +1,46 @@
+<ion-view view-title="订单详情">
+<ion-nav-buttons side="right">
+<button class="button button-positive" ng-disabled="bill.is_payed" ng-click="pay()">付款</button>
+</ion-nav-buttons>
+<ion-content padding="true">
+<div class="list">
+    <a class="item">
+        <h2>是否已付款</h1>
+        <p>{{bill.is_payed?'是':'否'}}</p>
+    </a>
+    <a class="item">
+        <h2>是否已结束</h1>
+        <p>{{bill.finished?'是':'否'}}</p>
+    </a>
+    <a class="item">
+        <h2>购买时间</h1>
+        <p>{{bill.time}}</p>
+    </a>
+    <a class="item">
+        <h2>总注数</h1>
+        <p>{{bill.bet_count}}</p>
+    </a>
+    <a class="item">
+        <h2>倍数</h1>
+        <p>{{bill.multiple}}</p>
+    </a>
+    <a class="item">
+        <h2>总金额</h1>
+        <p>{{2*bill.bet_count*bill.multiple}}元</p>
+    </a>
+    <a class="item">
+        <h2>奖金</h1>
+        <p>{{bill.bonus}}元</p>
+    </a>
+    <a class="item">
+        <h2>购买内容</h1>
+        <h4 ng-repeat="match in bill.matches" ng-if="match.selectedOptions.length!=0">{{match.home}} VS {{match.away}}
+            <p>{{options2text(match.selectedOptions)}}</p>
+        </h4>
+    </a>
+    <a class="item" ng-show="!bill.is_payed">
+        <button class="button button-block button-positive" ng-click="del()">删除订单</button>
+    </a>
+</div>
+</ion-content>
+</ion-view>

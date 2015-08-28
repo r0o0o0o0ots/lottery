@@ -5,6 +5,16 @@ from .models import Match,Odd,CurrentMatch
 from .models import FootballBill,FootballBillDetail
 from .models import TraditionalGame,TraditionalMatches,TraditionalBill
 import math
+from datetime import datetime
+
+def error(msg):
+    r = HttpResponse()
+    r['Access-Control-Allow-Origin'] = '*'
+    data = {}
+    data['errmsg']=msg
+    s=json.dumps(data)
+    r.write(s)
+    return r
 
 def calBetCount(combs,n):
     bet_count=0
@@ -17,6 +27,13 @@ def getMatchInfo(request):
     r = HttpResponse()
     r['Access-Control-Allow-Origin'] = '*'
     data = {}
+
+    params = json.loads(request.body)
+    email=params.get('email')
+    password=params.get('password')
+    accts=Account.objects.filter(email=email,password=password)
+    if len(accts)!=1:
+        return error('user error')
 
     matches_info=[]
     cmatches=CurrentMatch.objects.all()
@@ -124,7 +141,6 @@ def getFootballBillDetail(request):
     data = {}
 
     params = json.loads(request.body)
-    print params
     email=params.get('email')
     password=params.get('password')
     accts=Account.objects.filter(email=email,password=password)
@@ -283,7 +299,7 @@ def getTraditionalInfo(request):
         return r
 
     game=games[0]
-    tmatches=TraditionalMatches.objects.filter(game=game)
+    tmatches=TraditionalMatches.objects.filter(game=game).order_by('id')
     matches_info=[]
     for tmatch in tmatches:
         match=tmatch.match
@@ -332,10 +348,192 @@ def createTraditionalBill(request):
     game=TraditionalGame.objects.get(pk=id)
     bill.game=game
     bill.content=json.dumps(matches)
+    bill.bet_count=1;
     bill.save()
 
     data['errmsg']='success'
     data['billid']=bill.id
+    s=json.dumps(data)
+    r.write(s)
+    return r
+
+def getTraditionalBills(request):
+    r = HttpResponse()
+    r['Access-Control-Allow-Origin'] = '*'
+    data = {}
+
+    params = json.loads(request.body)
+    email=params.get('email')
+    password=params.get('password')
+    accts=Account.objects.filter(email=email,password=password)
+    if len(accts)!=1:
+        data['errmsg']='user error'
+        s=json.dumps(data)
+        r.write(s)
+        return r
+    acct=accts[0]
+    bills=TraditionalBill.objects.filter(acct=acct)
+    billsInfo=[]
+    for bill in bills:
+        billInfo={}
+        billInfo['id']=bill.id
+        #billInfo['time']=bill.time.strftime('%Y-%m-%d %H:%M:%S')
+        billInfo['type']=bill.type
+        #billInfo['multiple']=bill.multiple
+        billInfo['is_payed']=bill.is_payed
+        billInfo['bet_count']=bill.bet_count
+        #billInfo['bonus']=str(bill.bonus)
+        #billInfo['content']=bill.content
+        billInfo['finished']=bill.game.results!='x'
+        billsInfo.append(billInfo)
+
+    data['errmsg']='success'
+    data['bills']=billsInfo
+    s=json.dumps(data)
+    r.write(s)
+    return r
+
+def getTraditionalBillDetail(request):
+    r = HttpResponse()
+    r['Access-Control-Allow-Origin'] = '*'
+    data = {}
+
+    params = json.loads(request.body)
+    email=params.get('email')
+    password=params.get('password')
+    accts=Account.objects.filter(email=email,password=password)
+    if len(accts)!=1:
+        data['errmsg']='user error'
+        s=json.dumps(data)
+        r.write(s)
+        return r
+    acct=accts[0]
+    billid=params.get('billid')
+    bills=TraditionalBill.objects.filter(acct=acct,id=billid)
+    if len(bills)!=1:
+        data['errmsg']='no such bill'
+        s=json.dumps(data)
+        r.write(s)
+        return r
+
+    bill=bills[0]
+    billInfo={}
+    billInfo['id']=bill.id
+    billInfo['time']=bill.time.strftime('%Y-%m-%d %H:%M:%S')
+    billInfo['type']=bill.type
+    billInfo['multiple']=bill.multiple
+    billInfo['is_payed']=bill.is_payed
+    billInfo['bet_count']=bill.bet_count
+    billInfo['bonus']=str(bill.bonus)
+    billInfo['finished']=bill.game.results!='x'
+    content=json.loads(bill.content)
+    tmatches=TraditionalMatches.objects.filter(game=bill.game).order_by('id')
+    matches_info=[]
+    for i,tmatch in enumerate(tmatches):
+        match=tmatch.match
+        match_info={}
+        match_info['home']=match.home
+        match_info['away']=match.away
+        match_info['selectedOptions']=content[i]
+        matches_info.append(match_info)
+    billInfo['matches']=matches_info
+
+    data['errmsg']='success'
+    data['bill']=billInfo
+    s=json.dumps(data)
+    r.write(s)
+    return r
+
+def delTraditionalBill(request):
+    r = HttpResponse()
+    r['Access-Control-Allow-Origin'] = '*'
+    data = {}
+
+    params = json.loads(request.body)
+    email=params.get('email')
+    password=params.get('password')
+    billid=params.get('billid')
+    accts=Account.objects.filter(email=email,password=password)
+    if len(accts)!=1:
+        data['errmsg']='user error'
+        s=json.dumps(data)
+        r.write(s)
+        return r
+    acct=accts[0]
+    bills=TraditionalBill.objects.filter(acct=acct,id=billid)
+    if len(bills)!=1:
+        data['errmsg']='bill id error'
+        s=json.dumps(data)
+        r.write(s)
+        return r
+
+    bill=bills[0]
+    if bill.is_payed:
+        data['errmsg']='already payed, can not be deleted'
+        s=json.dumps(data)
+        r.write(s)
+        return r
+
+    bill.delete()
+
+    data['errmsg']='success'
+    s=json.dumps(data)
+    r.write(s)
+    return r
+
+def payTraditionalBill(request):
+    r = HttpResponse()
+    r['Access-Control-Allow-Origin'] = '*'
+    data = {}
+
+    params = json.loads(request.body)
+    email=params.get('email')
+    password=params.get('password')
+    billid=params.get('billid')
+    accts=Account.objects.filter(email=email,password=password)
+    if len(accts)!=1:
+        data['errmsg']='user error'
+        s=json.dumps(data)
+        r.write(s)
+        return r
+    acct=accts[0]
+    bills=TraditionalBill.objects.filter(acct=acct,id=billid)
+    if len(bills)!=1:
+        data['errmsg']='bill id error'
+        s=json.dumps(data)
+        r.write(s)
+        return r
+
+    bill=bills[0]
+    if bill.is_payed:
+        data['errmsg']='already payed'
+        s=json.dumps(data)
+        r.write(s)
+        return r
+    if bill.game.deadline<datetime.now():
+        return error('deadline exceeded')
+
+    money=2*bill.bet_count*bill.multiple
+    balancef=acct.balance_fixed
+    balanceu=acct.balance_unfixed
+    if money>balancef+balanceu:
+        data['errmsg']='no enough money'
+        s=json.dumps(data)
+        r.write(s)
+        return r
+    
+    if balancef>=money:
+        balancef=balancef-money
+    else:
+        balanceu-=money-balancef
+        balancef=0
+    acct.balance_fixed=balancef
+    acct.balance_unfixed=balanceu
+    acct.save()
+    bill.is_payed=True
+    bill.save()
+
+    data['errmsg']='success'
     s=json.dumps(data)
     r.write(s)
     return r

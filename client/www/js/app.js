@@ -13,12 +13,12 @@ $stateProvider.state('menu', {
         controller: 'MenuCtrl'
     });
 $stateProvider.state('signin', {
-        url: "/signin/:next",
+        url: "/signin",
         templateUrl: 'html/signin.html',
         controller: 'SigninCtrl'
     });
 $stateProvider.state('signup', {
-        url: "/signup/:next",
+        url: "/signup",
         templateUrl: 'html/signup.html',
         controller: 'SignupCtrl'
     });
@@ -27,20 +27,21 @@ $stateProvider.state('accountDetail', {
         templateUrl: 'html/accountDetail.html',
         controller: 'AccountDetailCtrl'
     });
+
 $stateProvider.state('football', {
         url: "/football",
         templateUrl: 'html/football.html',
         controller: 'FootballCtrl'
     });
-$stateProvider.state('football2', {
+$stateProvider.state('footballConfirm', {
         cache:false,
-        url: "/football2",
-        templateUrl: 'html/football2.html',
-        controller: 'Football2Ctrl'
+        url: "/footballConfirm",
+        templateUrl: 'html/footballConfirm.html',
+        controller: 'FootballConfirmCtrl'
     });
 $stateProvider.state('footballBills', {
         cache:false,
-        url: "/footballBills/:forward",
+        url: "/footballBills",
         templateUrl: 'html/footballBills.html',
         controller: 'FootballBillsCtrl'
     });
@@ -49,6 +50,7 @@ $stateProvider.state('footballBillDetail', {
         templateUrl: 'html/footballBillDetail.html',
         controller: 'FootballBillDetailCtrl'
     });
+
 $stateProvider.state('traditional', {
         url: "/traditional/:type",
         templateUrl: 'html/traditional.html',
@@ -59,6 +61,17 @@ $stateProvider.state('traditionalConfirm', {
         url: "/traditionalConfirm",
         templateUrl: 'html/traditionalConfirm.html',
         controller: 'TraditionalConfirmCtrl'
+    });
+$stateProvider.state('traditionalBills', {
+        cache:false,
+        url: "/traditionalBills",
+        templateUrl: 'html/traditionalBills.html',
+        controller: 'TraditionalBillsCtrl'
+    });
+$stateProvider.state('traditionalBillDetail', {
+        url: "/traditionalBillDetail/:billid",
+        templateUrl: 'html/traditionalBillDetail.html',
+        controller: 'TraditionalBillDetailCtrl'
     });
 $urlRouterProvider.otherwise('/menu');
 }]);

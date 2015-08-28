@@ -11,6 +11,10 @@ urlpatterns = [
 
             url(r'getTraditionalInfo', views.getTraditionalInfo, name='getTraditionalInfo' ),
             url(r'createTraditionalBill', views.createTraditionalBill, name='createTraditionaleBill' ),
+            url(r'getTraditionalBills', views.getTraditionalBills, name='getTraditionalBills' ),
+            url(r'getTraditionalBillDetail', views.getTraditionalBillDetail, name='getTraditionalBillDetail' ),
+            url(r'payTraditionalBill', views.payTraditionalBill, name='payTraditionalBill' ),
+            url(r'delTraditionalBill', views.delTraditionalBill, name='delTraditionalBill' ),
 
 ]
 
