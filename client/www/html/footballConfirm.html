@@ -12,11 +12,11 @@
 </ion-item>
 </ion-list>
 </ion-content>
-<ion-footer-bar class="bar bar-footer bar-calm item-input-inset" style="float:right">
-<button class="button button-positive" style="width:30%" ng-click="showComb()">{{selectedCombsText()||'选择串关方式'}}</button>
-<label style="width:20%;text-align:right">倍数: </label>
-<button class="button button-positive" style="width:10%;" ng-click="minus()">-</button>
-<input type="number" min="1" step="1" style="width:30%" ng-model="multiple">
-<button class="button button-positive" style="width:10%" ng-click="plus()">+</button>
+<ion-footer-bar class="bar bar-footer bar-calm row item item-input-inset">
+<button class="button button-positive col col-50" ng-click="showComb()">{{selectedCombsText()||'选择串关方式'}}</button>
+<label class="item-input col col-20" align="right">倍数: </label>
+<button class="button button-positive col col-10" ng-click="minus()">-</button>
+<input class="col col-10" type="number" min="1" step="1" ng-model="multiple" align="right">
+<button class="button button-positive col" ng-click="plus()">+</button>
 </ion-footer-bar>
 </ion-view>

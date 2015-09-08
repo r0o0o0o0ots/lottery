@@ -13,10 +13,10 @@
 </ion-item>
 </ion-list>
 </ion-content>
-<ion-footer-bar class="bar bar-footer bar-calm item-input-inset">
-<label style="width:25%;text-align:center">倍数: </label>
-<button class="button button-positive" style="width:10%;" ng-click="minus()">-</button>
-<input type="number" min="1" step="1" style="width:30%" ng-model="traditional_info.multiple">
-<button class="button button-positive" style="width:10%" ng-click="plus()">+</button>
+<ion-footer-bar class="bar bar-footer bar-calm row">
+<label class="col col-33" align="center">倍数: </label>
+<button class="button button-positive col col-10" ng-click="minus()">-</button>
+<input class="col col-25" align="center" type="number" min="1" step="1" ng-model="traditional_info.multiple">
+<button class="button button-positive col col-10" ng-click="plus()">+</button>
 </ion-footer-bar>
 </ion-view>
