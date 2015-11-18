@@ -1,4 +1,5 @@
-var server="http://192.168.1.250:8000";
+//var server="http://192.168.1.250:8000";
+var server="http://121.40.86.115:8000";
 var acct;
 //acct.email='a@b.com';
 //acct.password='qwe';
