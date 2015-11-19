@@ -34,6 +34,9 @@ function combs2text(combs){
 }
 
 function myhttp($http,$ionicPopup,$ionicLoading,url,data,successfunc){
+    $ionicLoading.show({
+        template: '<ion-spinner></ion-spinner><p>请稍候...</p>'
+    });
     $http({
         method: 'POST',
         url: url,
@@ -41,11 +44,15 @@ function myhttp($http,$ionicPopup,$ionicLoading,url,data,successfunc){
         headers: {'Content-Type':'text/plain'}
     })
     .success(function(data){
+        $ionicLoading.hide();
         if(data.errmsg=='success'){
             successfunc(data);
         }
         else{
-            alert(data.errmsg);
+            $ionicPopup.alert({
+                title: '错误',
+                template: data.errmsg
+            });
         }
     })
     .error(function(data){
@@ -117,12 +124,8 @@ app.controller('SigninCtrl',['$scope','$http','$state','$ionicHistory','$ionicLo
     function($scope,$http,$state,$ionicHistory,$ionicLoading,$ionicPopup){
         $scope.signinData = {};
         $scope.signin=function(){
-            $ionicLoading.show({
-                template: '<ion-spinner></ion-spinner><p>请稍候...</p>'
-            });
             data=myhttp($http,$ionicPopup,$ionicLoading,server+'/account/signin',$scope.signinData,function(data){
                 acct=data;
-                $ionicLoading.hide();
                 $ionicHistory.goBack(-1);
             });
         };
@@ -135,12 +138,8 @@ app.controller('SignupCtrl',['$scope','$http','$ionicHistory','$ionicLoading','$
     function($scope,$http,$ionicHistory,$ionicLoading,$ionicPopup){
         $scope.signupData = {sex:"0"};
         $scope.signup=function(){
-            $ionicLoading.show({
-                template: '<ion-spinner></ion-spinner><p>请稍候...</p>'
-            });
             myhttp($http,$ionicPopup,$ionicLoading,server+'/account/signup',$scope.signupData,function(data){
                 acct=data;
-                $ionicLoading.hide();
                 $ionicHistory.goBack(-2);
             });
         };
@@ -230,13 +229,9 @@ app.controller('FootballCtrl',['$scope','$state','$http','$ionicModal','$ionicLo
             $state.go('footballConfirm');
         };
         $scope.doRefresh=function(){
-            $ionicLoading.show({
-                template: '<ion-spinner></ion-spinner><p>请稍候...</p>'
-            });
             myhttp($http,$ionicPopup,$ionicLoading,server+'/football/getMatchInfo',{email:acct.email,password:acct.password},function(data){
                 $scope.matches=data.matches;
                 $scope.$broadcast('scroll.refreshComplete');
-                $ionicLoading.hide();
             });
         };
         $scope.doRefresh();
@@ -340,15 +335,11 @@ app.controller('FootballConfirmCtrl',['$scope','$state','$http','$ionicModal','$
                     });
                 }
 
-                $ionicLoading.show({
-                    template: '<ion-spinner></ion-spinner><p>请稍候...</p>'
-                });
                 myhttp($http,$ionicPopup,$ionicLoading,server+'/football/createBill',billInfo,function(data){
                     backBackViewId=$ionicHistory.backView().backViewId;
                     backBackView=$ionicHistory.viewHistory().views[backBackViewId];
                     $ionicHistory.currentView(backBackView);
                     $ionicHistory.clearCache();
-                    $ionicLoading.hide();
                     $state.go('footballBillDetail',{billid:data.billid},{location:'replace'});
                 });
             });
@@ -357,12 +348,8 @@ app.controller('FootballConfirmCtrl',['$scope','$state','$http','$ionicModal','$
 
 app.controller('FootballBillsCtrl',['$scope','$state','$http','$ionicLoading','$ionicPopup',
     function($scope,$state,$http,$ionicLoading,$ionicPopup){
-        $ionicLoading.show({
-            template: '<ion-spinner></ion-spinner><p>请稍候...</p>'
-        });
         myhttp($http,$ionicPopup,$ionicLoading,server+'/football/getFootballBills',{email:acct.email,password:acct.password},function(data){
             $scope.fbills=data.bills.reverse();
-            $ionicLoading.hide();
         });
         $scope.showDetail=function(index){
             $state.go('footballBillDetail',{billid:$scope.fbills[index].id});
@@ -372,9 +359,6 @@ app.controller('FootballBillsCtrl',['$scope','$state','$http','$ionicLoading','$
 app.controller('FootballBillDetailCtrl',['$scope','$state','$ionicPopup','$http','$ionicHistory','$ionicLoading',
     function($scope,$state,$ionicPopup,$http,$ionicHistory,$ionicLoading){
         var billid=$state.params.billid;
-        $ionicLoading.show({
-            template: '<ion-spinner></ion-spinner><p>请稍候...</p>'
-        });
         myhttp($http,$ionicPopup,$ionicLoading,server+'/football/getFootballBillDetail',{email:acct.email,password:acct.password,billid:billid},function(data){
             $scope.fbill=data.bill;
             var i;
@@ -384,7 +368,6 @@ app.controller('FootballBillDetailCtrl',['$scope','$state','$ionicPopup','$http'
             }
             var combs=JSON.parse($scope.fbill.comb_type);
             $scope.fbill.combsText=combs2text(combs);
-            $ionicLoading.hide();
         });
 
         $scope.pay=function(){
@@ -399,12 +382,8 @@ app.controller('FootballBillDetailCtrl',['$scope','$state','$ionicPopup','$http'
                     payInfo.billid=billid;
                     payInfo.email=acct.email;
                     payInfo.password=acct.password;
-                    $ionicLoading.show({
-                        template: '<ion-spinner></ion-spinner><p>请稍候...</p>'
-                    });
                     myhttp($http,$ionicPopup,$ionicLoading,server+'/football/payFootball',payInfo,function(data){
                         $scope.fbill.is_payed=true;
-                        $ionicLoading.hide();
                         $ionicPopup.alert({
                             title: '付款成功',
                             template: '付款成功！'
@@ -424,11 +403,7 @@ app.controller('FootballBillDetailCtrl',['$scope','$state','$ionicPopup','$http'
                     delInfo.email=acct.email;
                     delInfo.password=acct.password;
                     delInfo.billid=$scope.fbill.id;
-                    $ionicLoading.show({
-                        template: '<ion-spinner></ion-spinner><p>请稍候...</p>'
-                    });
                     myhttp($http,$ionicPopup,$ionicLoading,server+'/football/delFootballBill',delInfo,function(data){
-                        $ionicLoading.hide();
                         $ionicPopup.alert({
                             title: '删除成功',
                             template: '删除成功！'
@@ -483,16 +458,12 @@ app.controller('TraditionalCtrl',['$scope','$state','$ionicPopup','$http','$ioni
             }
         };
         $scope.doRefresh=function(){
-            $ionicLoading.show({
-                template: '<ion-spinner></ion-spinner><p>请稍候...</p>'
-            });
             myhttp($http,$ionicPopup,$ionicLoading,server+'/football/getTraditionalInfo',{email:acct.email,password:acct.password},function(data){
                 $scope.traditional_info.id=data.id;
                 $scope.traditional_info.SN=data.SN;
                 $scope.traditional_info.deadline=data.deadline;
                 $scope.traditional_info.matches=data.matches;
                 $scope.$broadcast('scroll.refreshComplete');
-                $ionicLoading.hide();
             });
         };
         $scope.doRefresh();
@@ -537,11 +508,7 @@ app.controller('TraditionalConfirmCtrl',['$scope','$state','$ionicPopup','$http'
                     billInfo.matches.push(match.selectedOptions);
                 }
 
-                $ionicLoading.show({
-                    template: '<ion-spinner></ion-spinner><p>请稍候...</p>'
-                });
                 myhttp($http,$ionicPopup,$ionicLoading,server+'/football/createTraditionalBill',billInfo,function(data){
-                    $ionicLoading.hide();
                     $ionicPopup.alert({
                         title:'下单成功',
                         template:'下单成功！'
@@ -560,12 +527,8 @@ app.controller('TraditionalConfirmCtrl',['$scope','$state','$ionicPopup','$http'
 app.controller('TraditionalBillsCtrl',['$scope','$state','$http','$ionicLoading','$ionicPopup',
     function($scope,$state,$http,$ionicLoading,$ionicPopup){
         $scope.type_texts=traditional_type_texts;
-        $ionicLoading.show({
-            template: '<ion-spinner></ion-spinner><p>请稍候...</p>'
-        });
         myhttp($http,$ionicPopup,$ionicLoading,server+'/football/getTraditionalBills',{email:acct.email,password:acct.password},function(data){
             $scope.bills=data.bills.reverse();
-            $ionicLoading.hide();
         });
         $scope.showDetail=function(index){
             $state.go('traditionalBillDetail',{billid:$scope.bills[index].id});
@@ -576,12 +539,8 @@ app.controller('TraditionalBillDetailCtrl',['$scope','$state','$ionicPopup','$ht
     function($scope,$state,$ionicPopup,$http,$ionicHistory,$ionicLoading){
         $scope.options2text=options2text;
         var billid=$state.params.billid;
-        $ionicLoading.show({
-            template: '<ion-spinner></ion-spinner><p>请稍候...</p>'
-        });
         myhttp($http,$ionicPopup,$ionicLoading,server+'/football/getTraditionalBillDetail',{email:acct.email,password:acct.password,billid:billid},function(data){
             $scope.bill=data.bill;
-            $ionicLoading.hide();
         });
 
         $scope.pay=function(){
@@ -596,12 +555,8 @@ app.controller('TraditionalBillDetailCtrl',['$scope','$state','$ionicPopup','$ht
                     payInfo.billid=billid;
                     payInfo.email=acct.email;
                     payInfo.password=acct.password;
-                    $ionicLoading.show({
-                        template: '<ion-spinner></ion-spinner><p>请稍候...</p>'
-                    });
                     myhttp($http,$ionicPopup,$ionicLoading,server+'/football/payTraditionalBill',payInfo,function(data){
                         $scope.bill.is_payed=true;
-                        $ionicLoading.hide();
                         $ionicPopup.alert({
                             title: '付款成功',
                             template: '付款成功！'
@@ -621,11 +576,7 @@ app.controller('TraditionalBillDetailCtrl',['$scope','$state','$ionicPopup','$ht
                     delInfo.email=acct.email;
                     delInfo.password=acct.password;
                     delInfo.billid=$scope.bill.id;
-                    $ionicLoading.show({
-                        template: '<ion-spinner></ion-spinner><p>请稍候...</p>'
-                    });
                     myhttp($http,$ionicPopup,$ionicLoading,server+'/football/delTraditionalBill',delInfo,function(data){
-                        $ionicLoading.hide();
                         $ionicPopup.alert({
                             title: '删除成功',
                             template: '删除成功！'
