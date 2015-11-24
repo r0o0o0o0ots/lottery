@@ -29,8 +29,8 @@ class FootballBill(models.Model):
     acct=models.ForeignKey(Account)
     time=models.DateTimeField(auto_now=True)
     #type=models.PositiveSmallIntegerField()
-    comb_type=models.CharField(max_length=7)
-    bet_count=models.PositiveIntegerField()
+    comb_type=models.CharField(max_length=20)
+    bet_count=models.PositiveIntegerField(default=0)
     match_count=models.PositiveSmallIntegerField()
     finished_match_count=models.PositiveSmallIntegerField(default=0)
     multiple=models.PositiveSmallIntegerField(default=1)
@@ -40,6 +40,7 @@ class FootballBill(models.Model):
 class FootballBillDetail(models.Model):
     bill=models.ForeignKey(FootballBill)
     match=models.ForeignKey(Match)
+    odd=models.ForeignKey(Odd)
     content=models.CharField(max_length=200)
 
 #class FootballBet(models.Model):

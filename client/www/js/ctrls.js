@@ -1,5 +1,5 @@
-//var server="http://192.168.1.250:8000";
-var server="http://121.40.86.115:8000";
+var server="http://192.168.1.250:8000";
+//var server="http://121.40.86.115:8000";
 var acct;
 //acct.email='a@b.com';
 //acct.password='qwe';
@@ -517,7 +517,8 @@ app.controller('TraditionalConfirmCtrl',['$scope','$state','$ionicPopup','$http'
                         backBackView=$ionicHistory.viewHistory().views[backBackViewId];
                         $ionicHistory.currentView(backBackView);
                         $ionicHistory.clearCache();
-                        $state.go('traditionalBills',{forward:true},{location:'replace'});
+                        $state.go('traditionalBillDetail',{billid:data.billid},{location:'replace'});
+                        //$state.go('traditionalBills',{forward:true},{location:'replace'});
                     });
                 });
             });
