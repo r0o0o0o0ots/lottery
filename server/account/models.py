@@ -5,7 +5,7 @@ account_history_types=['charge','buy','bonus','draw','give','accept']
 
 class Account(models.Model):
     email=models.EmailField(unique=True)
-    password=models.CharField(max_length=30)
+    password=models.CharField(max_length=77)
     nick_name=models.CharField(max_length=20)
     real_name=models.CharField(max_length=20)
     sex=models.BooleanField()

@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from .models import Account
 import json
+from django.contrib.auth.hashers import make_password,check_password
 
 # Create your views here.
 def signin(request):
@@ -30,7 +31,7 @@ def signin(request):
         r.write(s)
         return r
     acct = accts[0]
-    if acct.password != password:
+    if not check_password(password,acct.password):
         data['errmsg'] = 'Wrong password'
         s = json.dumps(data)
         r.write(s)
@@ -38,7 +39,6 @@ def signin(request):
 
     data['errmsg'] = 'success'
     data['email'] = acct.email
-    data['password']=acct.password
     data['nick_name'] = acct.nick_name
     data['real_name'] = acct.real_name
     data['sex'] = acct.sex
@@ -80,7 +80,7 @@ def signup(request):
 
     acct = Account()
     acct.email = email
-    acct.password = password
+    acct.password = make_password(password,None,"pbkdf2_sha256")
     acct.nick_name = nick_name
     acct.real_name = real_name
     acct.sex = int(sex)

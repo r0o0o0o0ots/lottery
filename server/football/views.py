@@ -6,6 +6,7 @@ from .models import FootballBill,FootballBillDetail
 from .models import TraditionalGame,TraditionalMatches,TraditionalBill
 from datetime import datetime
 import itertools
+from django.contrib.auth.hashers import make_password,check_password
 
 def error(msg):
     r = HttpResponse()
