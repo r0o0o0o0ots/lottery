@@ -4,6 +4,7 @@
 </ion-nav-buttons>
 <ion-content padding="true" class="text-center">
 <h1>你已选择{{selectedMatches.length}}场比赛</h1>
+<h2>共{{total_bet_count()}}注，{{multiple}}倍，共{{2*total_bet_count()*multiple}}元</h2>
 <ion-list>
 <ion-item ng-repeat="match in selectedMatches">
 <h2>{{match.home}} <i>VS</i> {{match.away}} ({{match.handicap}})</h2>

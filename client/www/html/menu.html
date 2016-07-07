@@ -2,10 +2,11 @@
 <ion-content padding="true" class="text-center">
 <ion-list>
 <ion-item class="button-bar">
-    <a class="button button-positive" ng-show="!isSignedIn()" href="#/signin">登陆</a>
-    <button class="button button-positive" ng-show="isSignedIn()" ng-click="signout()">注销</button>
+    <button class="button button-positive" ng-click="go('signin')" ng-show="!isSignedIn()">登陆</a>
+    <button class="button button-positive" ng-click="go('signup')" ng-show="!isSignedIn()">注册</button>
+    <button class="button button-positive" ng-click="signout()" ng-show="isSignedIn()">注销</button>
     <button class="button button-positive" ng-click="go('accountDetail')">账户详情</button>
-    <button class="button button-positive" ng-click="">高频彩</button>
+    <!--<button class="button button-positive" ng-click="">高频彩</button>-->
 </ion-item>
 <ion-item class="button-bar">
     <button class="button button-positive" ng-click="go('football')">竞彩足球</button>

@@ -6,7 +6,7 @@ from .models import FootballBill,FootballBillDetail
 from .models import TraditionalGame,TraditionalMatches,TraditionalBill
 from datetime import datetime
 import itertools
-from django.contrib.auth.hashers import make_password,check_password
+from django.contrib.auth.hashers import check_password
 
 def error(msg):
     r = HttpResponse()
@@ -18,12 +18,15 @@ def error(msg):
     return r
 
 def getAcct(params):
-    email=params.get('email')
+    phone_number=params.get('phone_number')
     password=params.get('password')
-    accts=Account.objects.filter(email=email,password=password)
-    if len(accts)!=1:
+    try:
+        acct=Account.objects.get(phone_number=phone_number)
+        if check_password(password,acct.password):
+            return acct
+    except:
         return None
-    return accts[0]
+    return None
 
 def getBill(params,acct):
     billid=params.get('billid')
@@ -58,11 +61,6 @@ def getMatchInfo(request):
     acct=getAcct(params)
     if acct==None:
         return error('user error')
-    #email=params.get('email')
-    #password=params.get('password')
-    #accts=Account.objects.filter(email=email,password=password)
-    #if len(accts)!=1:
-    #    return error('user error')
 
     matches_info=[]
     cmatches=CurrentMatch.objects.all()
@@ -91,15 +89,7 @@ def createBill(request):
     acct=getAcct(params)
     if acct==None:
         return error('user error')
-    #email=params.get('email')
-    #password=params.get('password')
-    #accts=Account.objects.filter(email=email,password=password)
-    #if len(accts)!=1:
-    #    return error('user error')
-    #    #data['errmsg']='user error'
-    #    #s=json.dumps(data)
-    #    #r.write(s)
-    #    #return r
+
     matchesInfo=params.get('matches')
     combs=params.get('combs')
     multiple=params.get('multiple')
@@ -144,16 +134,7 @@ def getFootballBills(request):
     acct=getAcct(params)
     if acct==None:
         return error('user error')
-    #email=params.get('email')
-    #password=params.get('password')
-    #accts=Account.objects.filter(email=email,password=password)
-    #if len(accts)!=1:
-    #    return error('user error')
-    #    #data['errmsg']='user error'
-    #    #s=json.dumps(data)
-    #    #r.write(s)
-    #    #return r
-    #acct=accts[0]
+
     bills=FootballBill.objects.filter(acct=acct)
     billsInfo=[]
     for bill in bills:
@@ -188,27 +169,7 @@ def getFootballBillDetail(request):
     acct=getAcct(params)
     if acct==None:
         return error('user error')
-    #email=params.get('email')
-    #password=params.get('password')
-    #accts=Account.objects.filter(email=email,password=password)
-    #if len(accts)!=1:
-    #    return error('user error')
-    #    #data['errmsg']='user error'
-    #    #s=json.dumps(data)
-    #    #r.write(s)
-    #    #return r
-    #acct=accts[0]
 
-    #billid=params.get('billid')
-    #bills=FootballBill.objects.filter(acct=acct,id=billid)
-    #if len(bills)!=1:
-    #    return error('no such bill')
-    #    #data['errmsg']='no such bill'
-    #    #s=json.dumps(data)
-    #    #r.write(s)
-    #    #return r
-
-    #bill=bills[0]
     bill=getBill(params,acct)
     if bill==None:
         return error('no such bill')
@@ -223,6 +184,7 @@ def getFootballBillDetail(request):
     billInfo['is_payed']=bill.is_payed
     billInfo['bonus']=str(bill.bonus)
     fbds=FootballBillDetail.objects.filter(bill=bill)
+    print len(fbds)
     matches=[]
     for fbd in fbds:
         matches.append({'home':fbd.match.home,'away':fbd.match.away,'handicap':fbd.match.handicap,'selectedOptions':fbd.content})
@@ -242,46 +204,18 @@ def payFootball(request):
     acct=getAcct(params)
     if acct==None:
         return error('user error')
-    #email=params.get('email')
-    #password=params.get('password')
-    #accts=Account.objects.filter(email=email,password=password)
-    #if len(accts)!=1:
-    #    return error('user error')
-    #    #data['errmsg']='user error'
-    #    #s=json.dumps(data)
-    #    #r.write(s)
-    #    #return r
-    #acct=accts[0]
 
-    #billid=params.get('billid')
-    #bills=FootballBill.objects.filter(acct=acct,id=billid)
-    #if len(bills)!=1:
-    #    return error('bill id error')
-    #    #data['errmsg']='bill id error'
-    #    #s=json.dumps(data)
-    #    #r.write(s)
-    #    #return r
-
-    #bill=bills[0]
     bill=getBill(params,acct)
     if bill==None:
         return error('no such bill')
     if bill.is_payed:
         return error('already payed')
-        #data['errmsg']='already payed'
-        #s=json.dumps(data)
-        #r.write(s)
-        #return r
 
     money=2*bill.bet_count*bill.multiple
     balancef=acct.balance_fixed
     balanceu=acct.balance_unfixed
     if money>balancef+balanceu:
         return error('no enough money')
-        #data['errmsg']='no enough money'
-        #s=json.dumps(data)
-        #r.write(s)
-        #return r
     
     if balancef>=money:
         balancef=balancef-money
@@ -307,36 +241,12 @@ def delFootballBill(request):
     acct=getAcct(params)
     if acct==None:
         return error('user error')
-    #email=params.get('email')
-    #password=params.get('password')
-    #accts=Account.objects.filter(email=email,password=password)
-    #if len(accts)!=1:
-    #    return error('user error')
-    #    #data['errmsg']='user error'
-    #    #s=json.dumps(data)
-    #    #r.write(s)
-    #    #return r
-    #acct=accts[0]
 
-    #billid=params.get('billid')
-    #bills=FootballBill.objects.filter(acct=acct,id=billid)
-    #if len(bills)!=1:
-    #    return error('bill id error')
-    #    #data['errmsg']='bill id error'
-    #    #s=json.dumps(data)
-    #    #r.write(s)
-    #    #return r
-
-    #bill=bills[0]
     bill=getBill(params,acct)
     if bill==None:
         return error('no such bill')
     if bill.is_payed:
         return error('already payed, can not be deleted')
-        #data['errmsg']='already payed, can not be deleted'
-        #s=json.dumps(data)
-        #r.write(s)
-        #return r
 
     fbds=FootballBillDetail.objects.filter(bill=bill)
     for fbd in fbds:
@@ -356,23 +266,10 @@ def getTraditionalInfo(request):
     acct=getAcct(params)
     if acct==None:
         return error('user error')
-    #email=params.get('email')
-    #password=params.get('password')
-    #accts=Account.objects.filter(email=email,password=password)
-    #if len(accts)!=1:
-    #    return error('user error')
-    #    #data['errmsg']='user error'
-    #    #s=json.dumps(data)
-    #    #r.write(s)
-    #    #return r
 
     games=TraditionalGame.objects.order_by('-id')
     if len(games)==0:
         return error('no game')
-        #data['errmsg']='no game'
-        #s=json.dumps(data)
-        #r.write(s)
-        #return r
 
     game=games[0]
     tmatches=TraditionalMatches.objects.filter(game=game).order_by('id')
@@ -404,16 +301,6 @@ def createTraditionalBill(request):
     acct=getAcct(params)
     if acct==None:
         return error('user error')
-    #email=params.get('email')
-    #password=params.get('password')
-    #accts=Account.objects.filter(email=email,password=password)
-    #if len(accts)!=1:
-    #    return error('user error')
-    #    #data['errmsg']='user error'
-    #    #s=json.dumps(data)
-    #    #r.write(s)
-    #    #return r
-    #acct=accts[0]
 
     id=params.get('id')
     multiple=params.get('multiple')
@@ -449,16 +336,7 @@ def getTraditionalBills(request):
     acct=getAcct(params)
     if acct==None:
         return error('user error')
-    #email=params.get('email')
-    #password=params.get('password')
-    #accts=Account.objects.filter(email=email,password=password)
-    #if len(accts)!=1:
-    #    return error('user error')
-    #    #data['errmsg']='user error'
-    #    #s=json.dumps(data)
-    #    #r.write(s)
-    #    #return r
-    #acct=accts[0]
+
     bills=TraditionalBill.objects.filter(acct=acct)
     billsInfo=[]
     for bill in bills:
@@ -488,27 +366,7 @@ def getTraditionalBillDetail(request):
     acct=getAcct(params)
     if acct==None:
         return error('user error')
-    #email=params.get('email')
-    #password=params.get('password')
-    #accts=Account.objects.filter(email=email,password=password)
-    #if len(accts)!=1:
-    #    return error('user error')
-    #    #data['errmsg']='user error'
-    #    #s=json.dumps(data)
-    #    #r.write(s)
-    #    #return r
-    #acct=accts[0]
 
-    #billid=params.get('billid')
-    #bills=TraditionalBill.objects.filter(acct=acct,id=billid)
-    #if len(bills)!=1:
-    #    return error('no such bill')
-    #    #data['errmsg']='no such bill'
-    #    #s=json.dumps(data)
-    #    #r.write(s)
-    #    #return r
-
-    #bill=bills[0]
     bill=getTraditionalBill(params,acct)
     if bill==None:
         return error('no such bill')
@@ -547,36 +405,12 @@ def delTraditionalBill(request):
     acct=getAcct(params)
     if acct==None:
         return error('user error')
-    #email=params.get('email')
-    #password=params.get('password')
-    #accts=Account.objects.filter(email=email,password=password)
-    #if len(accts)!=1:
-    #    return error('user error')
-    #    #data['errmsg']='user error'
-    #    #s=json.dumps(data)
-    #    #r.write(s)
-    #    #return r
-    #acct=accts[0]
 
-    #billid=params.get('billid')
-    #bills=TraditionalBill.objects.filter(acct=acct,id=billid)
-    #if len(bills)!=1:
-    #    return error('bill id error')
-    #    #data['errmsg']='bill id error'
-    #    #s=json.dumps(data)
-    #    #r.write(s)
-    #    #return r
-
-    #bill=bills[0]
     bill=getBill(params,acct)
     if bill==None:
         return error('no such bill')
     if bill.is_payed:
         return error('already payed, can not be deleted')
-        #data['errmsg']='already payed, can not be deleted'
-        #s=json.dumps(data)
-        #r.write(s)
-        #return r
     bill.delete()
 
     r = HttpResponse()
@@ -592,36 +426,12 @@ def payTraditionalBill(request):
     acct=getAcct(params)
     if acct==None:
         return error('user error')
-    #email=params.get('email')
-    #password=params.get('password')
-    #accts=Account.objects.filter(email=email,password=password)
-    #if len(accts)!=1:
-    #    return error('user error')
-    #    #data['errmsg']='user error'
-    #    #s=json.dumps(data)
-    #    #r.write(s)
-    #    #return r
-    #acct=accts[0]
 
-    #billid=params.get('billid')
-    #bills=TraditionalBill.objects.filter(acct=acct,id=billid)
-    #if len(bills)!=1:
-    #    return error('bill id error')
-    #    #data['errmsg']='bill id error'
-    #    #s=json.dumps(data)
-    #    #r.write(s)
-    #    #return r
-
-    #bill=bills[0]
     bill=getBill(params,acct)
     if bill==None:
         return error('no such bill')
     if bill.is_payed:
         return error('already payed')
-        #data['errmsg']='already payed'
-        #s=json.dumps(data)
-        #r.write(s)
-        #return r
     if bill.game.deadline<datetime.now():
         return error('deadline exceeded')
 
@@ -630,10 +440,6 @@ def payTraditionalBill(request):
     balanceu=acct.balance_unfixed
     if money>balancef+balanceu:
         return error('no enough money')
-        #data['errmsg']='no enough money'
-        #s=json.dumps(data)
-        #r.write(s)
-        #return r
     
     if balancef>=money:
         balancef=balancef-money
