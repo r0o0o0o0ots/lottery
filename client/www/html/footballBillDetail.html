@@ -1,6 +1,6 @@
 <ion-view view-title="订单详情">
 <ion-nav-buttons side="right">
-<button class="button button-positive" ng-disabled="fbill.is_payed" ng-click="pay()">付款</button>
+<button class="button button-positive" ng-disabled="fbill.is_payed" ng-click="pay()">{{fbill.is_payed?"已付款":"付款"}}</button>
 </ion-nav-buttons>
 <ion-content padding="true">
 <div class="list">

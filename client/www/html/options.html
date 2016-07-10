@@ -1,7 +1,7 @@
 <ion-modal-view class="text-center">
-    <ion-header-bar>
+    <ion-header-bar align-title="center">
+        <button class="button button-positive" ng-click="closeOptions()">取消</button>
         <h1 class="title">{{match.home}} <i>VS</i> {{match.away}}</h1>
-        <button class="button button-positive" ng-click="closeOptions()">关闭</button>
         <button class="button button-positive" ng-click="confirmOptions()">确定</button>
     </ion-header-bar>
     <ion-content>

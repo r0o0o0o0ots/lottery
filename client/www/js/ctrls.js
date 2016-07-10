@@ -1,6 +1,6 @@
 //var server="http://192.168.1.250:8000";
-var server="http://127.0.0.1:8000";
-//var server="http://121.40.86.115:8000";
+//var server="http://127.0.0.1:8000";
+var server="http://121.40.86.115:8000";
 var acct;
 var matches;
 var traditional_info;
@@ -103,7 +103,9 @@ app.controller('MenuCtrl',['$scope','$state','$ionicPopup',
                 title: '确认注销',
                 template: '是否确认注销'
             }).then(function(yes){
-                acct=undefined;
+                if(yes){
+                    acct=undefined;
+                }
             });
         };
         $scope.go=function(next,params){
@@ -121,7 +123,8 @@ app.controller('SigninCtrl',['$scope','$http','$state','$ionicHistory','$ionicLo
         $scope.signinData = {};
         $scope.signin=function(){
             data=myhttp($http,$ionicPopup,$ionicLoading,server+'/account/signin',$scope.signinData,function(data){
-                acct=data;
+                acct={};
+                acct.phone_number=data.phone_number;
                 acct.password=$scope.signinData.password;
                 $ionicHistory.nextViewOptions({
                     disableBack:true
@@ -139,7 +142,8 @@ app.controller('SignupCtrl',['$scope','$http','$state','$ionicHistory','$ionicLo
         $scope.signupData = {sex:"0"};
         $scope.signup=function(){
             myhttp($http,$ionicPopup,$ionicLoading,server+'/account/signup',$scope.signupData,function(data){
-                acct=data;
+                acct={};
+                acct.phone_number=data.phone_number;
                 acct.password=$scope.signupData.password;
                 $ionicHistory.nextViewOptions({
                     disableBack:true
@@ -152,29 +156,21 @@ app.controller('SignupCtrl',['$scope','$http','$state','$ionicHistory','$ionicLo
         };
     }]);
 
-app.controller('AccountDetailCtrl',['$scope',
-    function($scope){
-        if(acct===undefined){
-            alert('no account');
-        }
-        else{
-            $scope.acct=acct;
-        }
+app.controller('AccountDetailCtrl',['$scope','$http','$ionicPopup','$ionicLoading',
+    function($scope,$http,$ionicPopup,$ionicLoading){
+        myhttp($http,$ionicPopup,$ionicLoading,server+'/account/signin',acct,function(data){
+            $scope.acct=data;
+        });
     }]);
 
 app.controller('FootballCtrl',['$scope','$state','$http','$ionicModal','$ionicLoading','$ionicPopup',
     function($scope,$state,$http,$ionicModal,$ionicLoading,$ionicPopup){
-        if(acct===undefined){
-            alert('no account');
-            return;
-        }
-
         $scope.categories=[
             {title:'胜平负',indices:[[0,1,2]]},
             {title:'让球胜平负',indices:[[3,4,5]]},
             {title:'总进球',indices:[[6,7,8,9],[10,11,12,13]]},
             {title:'半全场',indices:[[14,15,16],[17,18,19],[20,21,22]]},
-            {title:'全场比分',indices:[[23,24,25,26,27,28],[29,30,31,32,33,34],[35],[36,37,38,39],[40],[41,42,43,44,45,46],[47,48,49,50,51,52],[53]]}
+            {title:'全场比分',indices:[[23,24,25,26],[27,28,29,30],[31,32,33,34],[35],[36,37,38,39],[40],[41,42,43,44],[45,46,47,48],[49,50,51,52],[53]]}
         ];
 
         $ionicModal.fromTemplateUrl('html/options.html',{
@@ -182,47 +178,64 @@ app.controller('FootballCtrl',['$scope','$state','$http','$ionicModal','$ionicLo
         }).then(function(modal){
             $scope.optionsModal=modal;
         });
-        $scope.optionSelected=[];
+        //$scope.optionSelected=[];
         $scope.showOptions=function(index){
             $scope.match=$scope.matches[index];
-            var i;
-            for(i=0;i<54;i++){
-                $scope.optionSelected[i]=false;
-            }
-            var selectedOptions=$scope.match.selectedOptions;
-            if(selectedOptions!==undefined){
-                for(i=0;i<selectedOptions.length;i++){
-                    $scope.optionSelected[selectedOptions[i]]=true;
-                }
-            }
+            $scope.currentSelectedOptions=$scope.match.selectedOptions===undefined?[]:$scope.match.selectedOptions.slice(0);
+            //for(i=0;i<54;i++){
+            //    $scope.optionSelected[i]=false;
+            //}
+            //var selectedOptions=$scope.match.selectedOptions;
+            //if(selectedOptions!==undefined){
+            //    for(i=0;i<selectedOptions.length;i++){
+            //        $scope.optionSelected[selectedOptions[i]]=true;
+            //    }
+            //}
             $scope.optionsModal.show();
         };
         $scope.closeOptions=function(){
             $scope.optionsModal.hide();
         };
         $scope.confirmOptions=function(){
-            var selectedOptions=[];
-            var i;
-            for(i=0;i<54;i++){
-                if($scope.optionSelected[i]){
-                    selectedOptions.push(i);
-                }
-            }
-            if(selectedOptions.length>0){
-                $scope.match.selectedOptions=selectedOptions;
-                $scope.match.selectedOptionsText=options2text(selectedOptions);
+            if($scope.currentSelectedOptions.length===0){
+                $scope.match.selectedOptions=undefined;
+                $scope.match.selectedOptionsText=undefined;
             }
             else{
-                delete $scope.match.selectedOptions;
-                delete $scope.match.selectedOptionsText;
+                $scope.match.selectedOptions=$scope.currentSelectedOptions.sort(function(a,b){
+                    return a>b?1:-1;
+                });
+                $scope.match.selectedOptionsText=options2text($scope.match.selectedOptions);
             }
+            //var selectedOptions=[];
+            //var i;
+            //for(i=0;i<54;i++){
+            //    if($scope.optionSelected[i]){
+            //        selectedOptions.push(i);
+            //    }
+            //}
+            //if(selectedOptions.length>0){
+            //    $scope.match.selectedOptions=selectedOptions;
+            //    $scope.match.selectedOptionsText=options2text(selectedOptions);
+            //}
+            //else{
+            //    delete $scope.match.selectedOptions;
+            //    delete $scope.match.selectedOptionsText;
+            //}
             $scope.optionsModal.hide();
         };
         $scope.optionPressed=function(option){
-            $scope.optionSelected[option]=!$scope.optionSelected[option];
+            //$scope.optionSelected[option]=!$scope.optionSelected[option];
+            index=$scope.currentSelectedOptions.indexOf(option);
+            if(index==-1){
+                $scope.currentSelectedOptions.push(option);
+            }
+            else{
+                $scope.currentSelectedOptions.splice(index,1);
+            }
         };
         $scope.isOptionSelected=function(option){
-            return $scope.optionSelected[option];
+            return $scope.currentSelectedOptions.indexOf(option)==-1?false:true;
         };
         $scope.optionText=optionText;
         $scope.matchSelected=function(index){
@@ -232,8 +245,9 @@ app.controller('FootballCtrl',['$scope','$state','$http','$ionicModal','$ionicLo
             matches=$scope.matches;
             $state.go('footballConfirm');
         };
+
         $scope.doRefresh=function(){
-            myhttp($http,$ionicPopup,$ionicLoading,server+'/football/getMatchInfo',{phone_number:acct.phone_number,password:acct.password},function(data){
+            myhttp($http,$ionicPopup,$ionicLoading,server+'/football/getMatchInfo',acct,function(data){
                 $scope.matches=data.matches;
                 $scope.$broadcast('scroll.refreshComplete');
             });
