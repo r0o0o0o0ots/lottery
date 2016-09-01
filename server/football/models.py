@@ -13,8 +13,10 @@ class Match(models.Model):
     HHAD=models.CharField(max_length=1,default='x')
     CRS=models.CharField(max_length=5,default='x:x')
     TTG=models.PositiveSmallIntegerField(default=0)
-    HFT=models.PositiveSmallIntegerField(default=0)
+    HFT=models.CharField(max_length=2,default='xx')
+    results=models.CharField(max_length=20,default="")
     mcode=models.CharField(max_length=10)
+    status=models.PositiveSmallIntegerField(default=0)
 
 class Odd(models.Model):
     match=models.ForeignKey(Match)
@@ -36,6 +38,7 @@ class FootballBill(models.Model):
     multiple=models.PositiveSmallIntegerField(default=1)
     is_payed=models.BooleanField(default=0)
     bonus=models.DecimalField(max_digits=10,decimal_places=2,default=0.0)
+    status=models.PositiveSmallIntegerField(default=0)
 
 class FootballBillDetail(models.Model):
     bill=models.ForeignKey(FootballBill)

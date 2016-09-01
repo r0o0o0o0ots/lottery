@@ -1,6 +1,6 @@
 //var server="http://192.168.1.250:8000";
-//var server="http://127.0.0.1:8000";
-var server="http://121.40.86.115:8000";
+var server="http://127.0.0.1:8000";
+//var server="http://121.40.86.115:8000";
 var acct;
 var matches;
 var traditional_info;
@@ -88,7 +88,7 @@ function myhttp($http,$ionicPopup,$ionicLoading,url,data,successfunc){
         $ionicLoading.hide();
         $ionicPopup.alert({
             title: '错误',
-            template: '网络异常'
+            template: JSON.stringify(data)
         });
     });
 }
@@ -380,6 +380,13 @@ app.controller('FootballConfirmCtrl',['$scope','$state','$http','$ionicModal','$
 
 app.controller('FootballBillsCtrl',['$scope','$state','$http','$ionicLoading','$ionicPopup',
     function($scope,$state,$http,$ionicLoading,$ionicPopup){
+        $scope.bill_status_text=[
+            '待付款',
+            '已失效',
+            '已付款',
+            '待结算',
+            '已完成'
+        ];
         myhttp($http,$ionicPopup,$ionicLoading,server+'/football/getFootballBills',{phone_number:acct.phone_number,password:acct.password},function(data){
             $scope.fbills=data.bills.reverse();
         });

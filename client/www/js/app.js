@@ -73,7 +73,7 @@ $stateProvider.state('traditionalBillDetail', {
         templateUrl: 'html/traditionalBillDetail.html',
         controller: 'TraditionalBillDetailCtrl'
     });
-$urlRouterProvider.otherwise('/menu');
+$urlRouterProvider.otherwise('/signin');
 }]);
 
 app.run(function($ionicPlatform) {

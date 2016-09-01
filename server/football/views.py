@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import JsonResponse
 import json
 from account.models import Account
 from .models import Match,CurrentMatch
@@ -8,25 +8,32 @@ from datetime import datetime
 import itertools
 from django.contrib.auth.hashers import check_password
 
-def error(msg):
-    r = HttpResponse()
-    r['Access-Control-Allow-Origin'] = '*'
-    data = {}
-    data['errmsg']=msg
-    s=json.dumps(data)
-    r.write(s)
-    return r
+def require_acct(func):
+    def wrapper(request):
+        try:
+            params = json.loads(request.body)
+            phone_number=params.get('phone_number')
+            password=params.get('password')
+            acct=Account.objects.get(phone_number=phone_number)
+            if check_password(password,acct.password):
+                request.acct=acct
+                return func(request)
+        except:
+            pass
+        return JsonResponse({'errmsg':'user error'})
 
-def getAcct(params):
-    phone_number=params.get('phone_number')
-    password=params.get('password')
-    try:
-        acct=Account.objects.get(phone_number=phone_number)
-        if check_password(password,acct.password):
-            return acct
-    except:
-        return None
-    return None
+    return wrapper
+
+#def getAcct(params):
+#    phone_number=params.get('phone_number')
+#    password=params.get('password')
+#    try:
+#        acct=Account.objects.get(phone_number=phone_number)
+#        if check_password(password,acct.password):
+#            return acct
+#    except:
+#        return None
+#    return None
 
 def getBill(params,acct):
     billid=params.get('billid')
@@ -56,12 +63,8 @@ def calBetCount(combs,counts):
     return bet_count
 
 # Create your views here.
+@require_acct
 def getMatchInfo(request):
-    params = json.loads(request.body)
-    acct=getAcct(params)
-    if acct==None:
-        return error('user error')
-
     matches_info=[]
     cmatches=CurrentMatch.objects.all()
     for cmatch in cmatches:
@@ -75,24 +78,20 @@ def getMatchInfo(request):
         info['odd']=odd.odd.split(' ')
         matches_info.append(info)
 
-    r = HttpResponse()
-    r['Access-Control-Allow-Origin'] = '*'
     data = {}
     data['errmsg']='success'
     data['matches']=matches_info
-    s=json.dumps(data)
-    r.write(s)
-    return r
+    return JsonResponse(data)
 
+@require_acct
 def createBill(request):
     params = json.loads(request.body)
-    acct=getAcct(params)
-    if acct==None:
-        return error('user error')
 
     matchesInfo=params.get('matches')
     combs=params.get('combs')
     multiple=params.get('multiple')
+
+    acct=request.acct
 
     fb=FootballBill()
     fb.acct=acct
@@ -105,7 +104,7 @@ def createBill(request):
         match=Match.objects.get(pk=matchInfo['id'])
         cmatches=CurrentMatch.objects.filter(match=match)
         if len(cmatches)!=1:
-            return error('no one current match')
+            return JsonResponse({'errmsg':'no one current match'})
         odd=cmatches[0].odd
         fbd=FootballBillDetail()
         fbd.bill=fb
@@ -116,25 +115,18 @@ def createBill(request):
         fbd.save()
     bet_count=calBetCount(fb.comb_type,selected_options_counts)
     if bet_count==-1:
-        return error('bet count error')
+        return JsonResponse({'errmsg':'bet count error'})
     fb.bet_count=bet_count
     fb.save()
 
-    r = HttpResponse()
-    r['Access-Control-Allow-Origin'] = '*'
     data = {}
     data['errmsg']='success'
     data['billid']=fb.id
-    s=json.dumps(data)
-    r.write(s)
-    return r
+    return JsonResponse(data)
 
+@require_acct
 def getFootballBills(request):
-    params = json.loads(request.body)
-    acct=getAcct(params)
-    if acct==None:
-        return error('user error')
-
+    acct=request.acct
     bills=FootballBill.objects.filter(acct=acct)
     billsInfo=[]
     for bill in bills:
@@ -148,6 +140,7 @@ def getFootballBills(request):
         billInfo['multiple']=bill.multiple
         billInfo['is_payed']=bill.is_payed
         billInfo['bonus']=str(bill.bonus)
+        billInfo['status']=bill.status
         #fbds=FootballBillDetail.objects.filter(bill=bill)
         #matches=[]
         #for fbd in fbds:
@@ -155,24 +148,18 @@ def getFootballBills(request):
         #billInfo['matches']=matches
         billsInfo.append(billInfo)
 
-    r = HttpResponse()
-    r['Access-Control-Allow-Origin'] = '*'
     data = {}
     data['errmsg']='success'
     data['bills']=billsInfo
-    s=json.dumps(data)
-    r.write(s)
-    return r
+    return JsonResponse(data)
 
+@require_acct
 def getFootballBillDetail(request):
     params = json.loads(request.body)
-    acct=getAcct(params)
-    if acct==None:
-        return error('user error')
-
+    acct=request.acct
     bill=getBill(params,acct)
     if bill==None:
-        return error('no such bill')
+        return JsonResponse({'errmsg':'no such bill'})
     billInfo={}
     billInfo['id']=bill.id
     billInfo['time']=bill.time.strftime('%Y-%m-%d %H:%M:%S')
@@ -184,38 +171,32 @@ def getFootballBillDetail(request):
     billInfo['is_payed']=bill.is_payed
     billInfo['bonus']=str(bill.bonus)
     fbds=FootballBillDetail.objects.filter(bill=bill)
-    print len(fbds)
     matches=[]
     for fbd in fbds:
         matches.append({'home':fbd.match.home,'away':fbd.match.away,'handicap':fbd.match.handicap,'selectedOptions':fbd.content})
     billInfo['matches']=matches
 
-    r = HttpResponse()
-    r['Access-Control-Allow-Origin'] = '*'
     data = {}
     data['errmsg']='success'
     data['bill']=billInfo
-    s=json.dumps(data)
-    r.write(s)
-    return r
+    return JsonResponse(data)
 
+@require_acct
 def payFootball(request):
     params = json.loads(request.body)
-    acct=getAcct(params)
-    if acct==None:
-        return error('user error')
+    acct=request.acct
 
     bill=getBill(params,acct)
     if bill==None:
-        return error('no such bill')
+        return JsonResponse({'errmsg':'no such bill'})
     if bill.is_payed:
-        return error('already payed')
+        return JsonResponse({'errmsg':'already payed'})
 
     money=2*bill.bet_count*bill.multiple
     balancef=acct.balance_fixed
     balanceu=acct.balance_unfixed
     if money>balancef+balanceu:
-        return error('no enough money')
+        return JsonResponse({'errmsg':'no enough money'})
     
     if balancef>=money:
         balancef=balancef-money
@@ -228,48 +209,31 @@ def payFootball(request):
     bill.is_payed=True
     bill.save()
 
-    r = HttpResponse()
-    r['Access-Control-Allow-Origin'] = '*'
-    data = {}
-    data['errmsg']='success'
-    s=json.dumps(data)
-    r.write(s)
-    return r
+    return JsonResponse({'errmsg':'success'})
 
+@require_acct
 def delFootballBill(request):
     params = json.loads(request.body)
-    acct=getAcct(params)
-    if acct==None:
-        return error('user error')
+    acct=request.acct
 
     bill=getBill(params,acct)
     if bill==None:
-        return error('no such bill')
+        return JsonResponse({'errmsg':'no such bill'})
     if bill.is_payed:
-        return error('already payed, can not be deleted')
+        return JsonResponse({'errmsg':'already payed, can not be deleted'})
 
     fbds=FootballBillDetail.objects.filter(bill=bill)
     for fbd in fbds:
         fbd.delete()
     bill.delete()
 
-    r = HttpResponse()
-    r['Access-Control-Allow-Origin'] = '*'
-    data = {}
-    data['errmsg']='success'
-    s=json.dumps(data)
-    r.write(s)
-    return r
+    return JsonResponse({'errmsg':'success'})
 
+@require_acct
 def getTraditionalInfo(request):
-    params = json.loads(request.body)
-    acct=getAcct(params)
-    if acct==None:
-        return error('user error')
-
     games=TraditionalGame.objects.order_by('-id')
     if len(games)==0:
-        return error('no game')
+        return JsonResponse({'errmsg':'no game'})
 
     game=games[0]
     tmatches=TraditionalMatches.objects.filter(game=game).order_by('id')
@@ -284,23 +248,18 @@ def getTraditionalInfo(request):
         info['odd']=odd.odd.split(' ')[:3]
         matches_info.append(info)
 
-    r = HttpResponse()
-    r['Access-Control-Allow-Origin'] = '*'
     data = {}
     data['errmsg']='success'
     data['id']=game.id
     data['SN']=game.SN
     data['deadline']=game.deadline.strftime('%Y-%m-%d %H:%M:%S')
     data['matches']=matches_info
-    s=json.dumps(data)
-    r.write(s)
-    return r
+    return JsonResponse(data)
 
+@require_acct
 def createTraditionalBill(request):
     params = json.loads(request.body)
-    acct=getAcct(params)
-    if acct==None:
-        return error('user error')
+    acct=request.acct
 
     id=params.get('id')
     multiple=params.get('multiple')
@@ -318,24 +277,18 @@ def createTraditionalBill(request):
     selected_options_counts=map(len,matches)
     bet_count=calBetCount(comb_type,selected_options_counts)
     if bet_count==-1:
-        return error('bet count error')
+        return JsonResponse({'errmsg':'bet count error'})
     bill.bet_count=bet_count;
     bill.save()
 
-    r = HttpResponse()
-    r['Access-Control-Allow-Origin'] = '*'
     data = {}
     data['errmsg']='success'
     data['billid']=bill.id
-    s=json.dumps(data)
-    r.write(s)
-    return r
+    return JsonResponse(data)
 
+@require_acct
 def getTraditionalBills(request):
-    params = json.loads(request.body)
-    acct=getAcct(params)
-    if acct==None:
-        return error('user error')
+    acct=request.acct
 
     bills=TraditionalBill.objects.filter(acct=acct)
     billsInfo=[]
@@ -352,24 +305,19 @@ def getTraditionalBills(request):
         billInfo['finished']=bill.game.results!='x'
         billsInfo.append(billInfo)
 
-    r = HttpResponse()
-    r['Access-Control-Allow-Origin'] = '*'
     data = {}
     data['errmsg']='success'
     data['bills']=billsInfo
-    s=json.dumps(data)
-    r.write(s)
-    return r
+    return JsonResponse(data)
 
+@require_acct
 def getTraditionalBillDetail(request):
     params = json.loads(request.body)
-    acct=getAcct(params)
-    if acct==None:
-        return error('user error')
+    acct=request.acct
 
     bill=getTraditionalBill(params,acct)
     if bill==None:
-        return error('no such bill')
+        return JsonResponse({'errmsg':'no such bill'})
     billInfo={}
     billInfo['id']=bill.id
     billInfo['time']=bill.time.strftime('%Y-%m-%d %H:%M:%S')
@@ -391,55 +339,43 @@ def getTraditionalBillDetail(request):
         matches_info.append(match_info)
     billInfo['matches']=matches_info
 
-    r = HttpResponse()
-    r['Access-Control-Allow-Origin'] = '*'
     data = {}
     data['errmsg']='success'
     data['bill']=billInfo
-    s=json.dumps(data)
-    r.write(s)
-    return r
+    return JsonResponse(data)
 
+@require_acct
 def delTraditionalBill(request):
     params = json.loads(request.body)
-    acct=getAcct(params)
-    if acct==None:
-        return error('user error')
+    acct=request.acct
 
     bill=getBill(params,acct)
     if bill==None:
-        return error('no such bill')
+        return JsonResponse({'errmsg':'no such bill'})
     if bill.is_payed:
-        return error('already payed, can not be deleted')
+        return JsonResponse({'errmsg':'already payed, can not be deleted'})
     bill.delete()
 
-    r = HttpResponse()
-    r['Access-Control-Allow-Origin'] = '*'
-    data = {}
-    data['errmsg']='success'
-    s=json.dumps(data)
-    r.write(s)
-    return r
+    return JsonResponse({'errmsg':'success'})
 
+@require_acct
 def payTraditionalBill(request):
     params = json.loads(request.body)
-    acct=getAcct(params)
-    if acct==None:
-        return error('user error')
+    acct=request.acct
 
     bill=getBill(params,acct)
     if bill==None:
-        return error('no such bill')
+        return JsonResponse({'errmsg':'no such bill'})
     if bill.is_payed:
-        return error('already payed')
+        return JsonResponse({'errmsg':'already payed'})
     if bill.game.deadline<datetime.now():
-        return error('deadline exceeded')
+        return JsonResponse({'errmsg':'deadline exceeded'})
 
     money=2*bill.bet_count*bill.multiple
     balancef=acct.balance_fixed
     balanceu=acct.balance_unfixed
     if money>balancef+balanceu:
-        return error('no enough money')
+        return JsonResponse({'errmsg':'no enough money'})
     
     if balancef>=money:
         balancef=balancef-money
@@ -452,10 +388,4 @@ def payTraditionalBill(request):
     bill.is_payed=True
     bill.save()
 
-    r = HttpResponse()
-    r['Access-Control-Allow-Origin'] = '*'
-    data = {}
-    data['errmsg']='success'
-    s=json.dumps(data)
-    r.write(s)
-    return r
+    return JsonResponse({'errmsg':'success'})

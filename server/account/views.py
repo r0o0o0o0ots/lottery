@@ -1,41 +1,27 @@
-from django.http import HttpResponse
+from django.http import JsonResponse
 from .models import Account
 import json
 from django.contrib.auth.hashers import make_password,check_password
 
 # Create your views here.
 def signin(request):
-    r = HttpResponse()
-    r['Access-Control-Allow-Origin'] = '*'
     data = {}
-
-    # if request.method=='OPTIONS':
-    #    r['Access-Control-Allow-Methods']= 'GET,PUT,POST'
-    #    r['Access-Control-Allow-Headers']= 'accept, content-type'
-    #    r['Access-Control-Max-Age'] = 1728000
-    #    return r
 
     params = json.loads(request.body)
     phone_number = params.get('phone_number')
     password = params.get('password')
     if not phone_number or not password:
         data['errmsg'] = 'Wrong parameters'
-        s = json.dumps(data)
-        r.write(s)
-        return r
+        return JsonResponse(data)
 
     accts = Account.objects.filter(phone_number=phone_number)
     if len(accts) != 1:
         data['errmsg'] = 'No such user'
-        s = json.dumps(data)
-        r.write(s)
-        return r
+        return JsonResponse(data)
     acct = accts[0]
     if not check_password(password,acct.password):
         data['errmsg'] = 'Wrong password'
-        s = json.dumps(data)
-        r.write(s)
-        return r
+        return JsonResponse(data)
 
     data['errmsg'] = 'success'
     data['phone_number'] = acct.phone_number
@@ -45,14 +31,10 @@ def signin(request):
     data['alipay_id'] = acct.alipay_id
     data['balance_unfixed'] = str(acct.balance_unfixed)
     data['balance_fixed'] = str(acct.balance_fixed)
-    s = json.dumps(data)
-    r.write(s)
-    return r
+    return JsonResponse(data)
 
 
 def signup(request):
-    r = HttpResponse()
-    r['Access-Control-Allow-Origin'] = '*'
     data = {}
 
     params = json.loads(request.body)
@@ -68,14 +50,10 @@ def signup(request):
     accts = Account.objects.filter(phone_number=phone_number)
     if len(accts) != 0:
         data['errmsg'] = 'Phone number already used'
-        s = json.dumps(data)
-        r.write(s)
-        return r
+        return JsonResponse(data)
     if password != confirm:
         data['errmsg'] = 'Confirm not match'
-        s = json.dumps(data)
-        r.write(s)
-        return r
+        return JsonResponse(data)
 
     acct = Account()
     acct.phone_number = phone_number
@@ -96,6 +74,4 @@ def signup(request):
     data['alipay_id'] = acct.alipay_id
     data['balance_unfixed'] = str(acct.balance_unfixed)
     data['balance_fixed'] = str(acct.balance_fixed)
-    s = json.dumps(data)
-    r.write(s)
-    return r
+    return JsonResponse(data)
